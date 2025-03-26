@@ -13,11 +13,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PeminjamanResource extends Resource
@@ -87,12 +90,45 @@ class PeminjamanResource extends Resource
                 TextColumn::make('status_peminjaman')
                     ->badge()
                     ->formatStateUsing(fn($state): string => str()->headline($state))
-                    ->label('Status'),
+                    ->label('Status')
+                    ->color(fn(string $state): string => match ($state) {
+                        'diajukan' => 'warning',
+                        'disetujui' => 'success',
+                        'ditolak' => 'danger',
+                    }),
+
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
+
             ->actions([
+                Action::make('approve')
+                    ->label('Setuju')
+                    ->color('success')
+                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan')
+                    ->action(function (Model $record) {
+                        $record->update(['status_peminjaman' => 'disetujui']);
+
+                        Notification::make()
+                            ->title('Peminjaman Disetujui')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->color('danger')
+                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan')
+                    ->action(function (Model $record) {
+                        $record->update(['status_peminjaman' => 'ditolak']);
+
+                        Notification::make()
+                            ->title('Peminjaman Ditolak')
+                            ->danger()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

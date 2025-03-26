@@ -6,6 +6,7 @@ use App\Filament\Resources\PeminjamanResource\Pages;
 use App\Filament\Resources\PeminjamanResource\RelationManagers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -22,8 +23,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Gate;
 
-class PeminjamanResource extends Resource
+class PeminjamanResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Peminjaman::class;
 
@@ -106,10 +108,9 @@ class PeminjamanResource extends Resource
                 Action::make('approve')
                     ->label('Setuju')
                     ->color('success')
-                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan')
+                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan' && Gate::allows('status_peminjaman'))
                     ->action(function (Model $record) {
                         $record->update(['status_peminjaman' => 'disetujui']);
-
                         Notification::make()
                             ->title('Peminjaman Disetujui')
                             ->success()
@@ -162,5 +163,18 @@ class PeminjamanResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+            'setuju'
+        ];
     }
 }

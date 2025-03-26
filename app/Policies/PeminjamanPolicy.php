@@ -105,4 +105,9 @@ class PeminjamanPolicy
     {
         return $user->can('reorder_peminjaman');
     }
+
+    public function setuju(User $user): bool
+    {
+        return $user->can('setuju_peminjaman');
+    }
 }

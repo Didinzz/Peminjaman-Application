@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->spa()
             ->middleware([
+                Authenticate::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,

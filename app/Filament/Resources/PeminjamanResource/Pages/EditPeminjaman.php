@@ -18,4 +18,14 @@ class EditPeminjaman extends EditRecord
             Actions\RestoreAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): ?string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Peminjaman Updated';
+    }
 }

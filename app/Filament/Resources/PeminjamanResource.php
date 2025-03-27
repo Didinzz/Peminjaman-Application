@@ -6,6 +6,7 @@ use App\Filament\Resources\PeminjamanResource\Pages;
 use App\Filament\Resources\PeminjamanResource\RelationManagers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -22,8 +23,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
-class PeminjamanResource extends Resource
+class PeminjamanResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Peminjaman::class;
 
@@ -63,6 +66,7 @@ class PeminjamanResource extends Resource
                     ->required(),
                 DatePicker::make('tanggal_kembali')
                     ->label('Tanggal Pengembalian')
+                    ->after('tanggal_pinjam')
                     ->required(),
                 FileUpload::make('bukti_peminjaman')
                     ->label('Bukti Peminjaman')
@@ -78,6 +82,7 @@ class PeminjamanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            // ->query(Peminjaman::where('status_peminjaman', 'disetujui'))
             ->columns([
                 TextColumn::make('tanggal_pinjam')
                     ->date('d F')
@@ -103,10 +108,21 @@ class PeminjamanResource extends Resource
             ])
 
             ->actions([
+                Action::make('bukti_peminjaman')
+                    ->label('Lihat Bukti')
+                    ->color('info')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading('Lihat Bukti Peminjaman')
+                    ->hidden(fn(Peminjaman $record) => !$record->bukti_peminjaman)
+                    ->url(fn(Peminjaman $record) => Storage::url($record->bukti_peminjaman), true) // Open in new tab
+                    ->openUrlInNewTab(),
                 Action::make('approve')
                     ->label('Setuju')
                     ->color('success')
-                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan')
+                    ->hidden(
+                        fn(Peminjaman $record) =>
+                        $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman')
+                    )
                     ->action(function (Model $record) {
                         $record->update(['status_peminjaman' => 'disetujui']);
 
@@ -119,7 +135,7 @@ class PeminjamanResource extends Resource
                 Action::make('tolak')
                     ->label('Tolak')
                     ->color('danger')
-                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan')
+                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
                     ->action(function (Model $record) {
                         $record->update(['status_peminjaman' => 'ditolak']);
 
@@ -129,7 +145,8 @@ class PeminjamanResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\EditAction::make(),
+
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -162,5 +179,24 @@ class PeminjamanResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'replicate',
+            'reorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+            'decide'
+        ];
     }
 }

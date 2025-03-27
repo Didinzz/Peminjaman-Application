@@ -35,11 +35,16 @@ class Peminjaman extends Model
     //add observer
     protected static function booted()
     {
+        static::updating(function ($peminjaman) {
+            if ($peminjaman->isDirty('bukti_peminjaman')) {
+                Storage::disk('public')->delete($peminjaman->getOriginal('bukti_peminjaman'));
+            }
+        });
+        
         //add delete event
         static::deleted(function ($peminjaman) {
-          //delete file from disk
-          Storage::disk('public')->delete($peminjaman->bukti_peminjaman);
+            //delete file from disk
+            Storage::disk('public')->delete($peminjaman->bukti_peminjaman);
         });
     }
-
 }

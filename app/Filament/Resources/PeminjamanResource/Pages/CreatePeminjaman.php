@@ -25,7 +25,6 @@ class CreatePeminjaman extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // dd($data);
         $userId = auth()->id();
         $data['user_id'] = $userId;
         return $data;

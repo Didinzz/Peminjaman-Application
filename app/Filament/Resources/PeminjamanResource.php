@@ -14,6 +14,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -23,6 +24,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,38 +46,12 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management Peminjaman';
 
-    protected function validateAndUpdateStock(array $data): array
-    {
-        $barang = Barang::find($data['barang_id']);
-
-        if (!$barang) {
-            Notification::make()
-                ->title('Barang tidak ditemukan.')
-                ->danger()
-                ->send();
-            return $data;
-        }
-
-        if ($barang->stock < $data['jumlah_pinjaman']) {
-            Notification::make()
-                ->title("Stok tidak mencukupi untuk barang {$barang->nama_barang}.")
-                ->danger()
-                ->send();
-            return $data;
-        }
-
-        // Kurangi stok barang sebelum disimpan
-        $barang->decrement('stock', $data['jumlah_pinjaman']);
-
-        return $data;
-    }
 
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-
                 Repeater::make('detailPeminjaman')
                     ->label('Barang Dipinjam')
                     ->addActionLabel('Tambah Barang')
@@ -94,11 +70,9 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                             })
                             ->label('Barang')
                             ->required(),
-
                         TextInput::make('stok_tersedia')
                             ->disabled()
                             ->label('Stok Tersedia'),
-
                         TextInput::make('jumlah_pinjaman')
                             ->label('Jumlah Pinjaman')
                             ->required()
@@ -117,23 +91,25 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                             }),
                     ])
                     ->columns(3),
-
-                DatePicker::make('tanggal_pinjam')
-                    ->label('Tanggal Peminjaman')
-                    ->required(),
-                DatePicker::make('tanggal_kembali')
-                    ->label('Tanggal Pengembalian')
-                    ->afterOrEqual('tanggal_pinjam')
-                    ->validationMessages(['after_or_equal' => 'Tanggal pengembalian harus setelah tanggal peminjaman.'])
-                    ->required(),
-                FileUpload::make('surat_peminjaman')
-                    ->label('Surat Peminjaman')
-                    ->directory('surat-peminjaman')
-                    ->required(),
-                Textarea::make('keterangan')
-                    ->columnSpan(2)
-                    ->label('Alasan Peminjaman'),
-
+                Section::make('Detail Pengajuan')
+                    ->columns(2)
+                    ->schema([
+                        DatePicker::make('tanggal_pinjam')
+                            ->label('Tanggal Peminjaman')
+                            ->required(),
+                        DatePicker::make('tanggal_kembali')
+                            ->label('Tanggal Pengembalian')
+                            ->afterOrEqual('tanggal_pinjam')
+                            ->validationMessages(['after_or_equal' => 'Tanggal pengembalian harus setelah tanggal peminjaman.'])
+                            ->required(),
+                        FileUpload::make('surat_peminjaman')
+                            ->label('Surat Peminjaman')
+                            ->directory('surat-peminjaman')
+                            ->required(),
+                        Textarea::make('keterangan')
+                            ->required()
+                            ->label('Alasan Peminjaman'),
+                    ])
             ]);
     }
 
@@ -180,45 +156,50 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             ])
 
             ->actions([
-                Action::make('bukti_peminjaman')
-                    ->label('Lihat Bukti')
-                    ->color('info')
-                    ->icon('heroicon-o-eye')
-                    ->modalHeading('Lihat Bukti Peminjaman')
-                    ->hidden(fn(Peminjaman $record) => !$record->bukti_peminjaman)
-                    ->url(fn(Peminjaman $record) => Storage::url($record->bukti_peminjaman), true) // Open in new tab
-                    ->openUrlInNewTab(),
-                Action::make('approve')
-                    ->label('Setuju')
-                    ->color('success')
-                    ->hidden(
-                        fn(Peminjaman $record) =>
-                        $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman')
-                    )
-                    ->action(function (Model $record) {
-                        $record->update(['status_peminjaman' => 'disetujui']);
+                ActionGroup::make([
+                    Action::make('bukti_peminjaman')
+                        ->label('Surat')
+                        // ->color('info')
+                        ->icon('heroicon-o-eye')
+                        ->modalHeading('Lihat Bukti Peminjaman')
+                        ->hidden(fn(Peminjaman $record) => !$record->surat_peminjaman)
+                        ->url(fn(Peminjaman $record) => Storage::url($record->surat_peminjaman), true) // Open in new tab
+                        ->openUrlInNewTab(),
+                    Action::make('approve')
+                        ->label('Setuju')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->hidden(
+                            fn(Peminjaman $record) =>
+                            $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman')
+                        )
+                        ->action(function (Model $record) {
+                            $record->update(['status_peminjaman' => 'disetujui']);
 
-                        Notification::make()
-                            ->title('Peminjaman Disetujui')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('tolak')
-                    ->label('Tolak')
-                    ->color('danger')
-                    ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
-                    ->action(function (Model $record) {
-                        $record->update(['status_peminjaman' => 'ditolak']);
+                            Notification::make()
+                                ->title('Peminjaman Disetujui')
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    Action::make('tolak')
+                        ->label('Tolak')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
+                        ->action(function (Model $record) {
+                            $record->update(['status_peminjaman' => 'ditolak']);
 
-                        Notification::make()
-                            ->title('Peminjaman Ditolak')
-                            ->danger()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
+                            Notification::make()
+                                ->title('Peminjaman Ditolak')
+                                ->danger()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
 
-                // Tables\Actions\EditAction::make(),
+                    // Tables\Actions\EditAction::make(),
+                ])
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -226,6 +207,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
+
             ]);
     }
 

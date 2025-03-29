@@ -6,10 +6,10 @@ ADMIN
 
 Wakasarpras
     - Menerima peminjaman barang dari peminjam
-    - Menyetujui/Menolak peminjaman barang
+    <!-- - Menyetujui/Menolak peminjaman barang -->
     
 Peminjam
-    - Melakukan pengisian peminjaman barang (nama barang apa saja yang dipinjam, jumlah pinjaman, tanggal peminjaman, tanggal pengembalian, surat peminjaman)
+    <!-- - Melakukan pengisian peminjaman barang (nama barang apa saja yang dipinjam, jumlah pinjaman, tanggal peminjaman, tanggal pengembalian, surat peminjaman) -->
     - Menunggu verifikasi peminjaman barang dari wakasarpras
 
     Tabel Peminjaman

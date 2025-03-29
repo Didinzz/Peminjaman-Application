@@ -3,8 +3,13 @@
 namespace App\Filament\Resources\PeminjamanResource\Pages;
 
 use App\Filament\Resources\PeminjamanResource;
+use App\Models\Barang;
+use App\Models\Peminjaman;
+use Illuminate\Validation\ValidationException;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class CreatePeminjaman extends CreateRecord
 {
@@ -17,8 +22,13 @@ class CreatePeminjaman extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected function getCreatedNotificationTitle(): ?string
+
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return 'Peminjaman Created';
+        // dd($data);
+        $userId = auth()->id();
+        $data['user_id'] = $userId;
+        return $data;
     }
+
 }

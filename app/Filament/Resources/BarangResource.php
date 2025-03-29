@@ -7,12 +7,16 @@ use App\Filament\Resources\BarangResource\RelationManagers;
 use App\Models\Barang;
 use Doctrine\DBAL\Schema\Index;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,17 +37,27 @@ class BarangResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label('Nama Barang')
-                    ->required(),
-                TextInput::make('stock')
-                    ->label('Stok Tersedia')
-                    ->required(),
-                Textarea::make('description')
-                    ->maxLength(255)
-                    ->columnSpan(2)
-                    ->label('Deskripsi')
-                    ->required(),
+                Section::make('Tambah Barang')
+                ->columns(2)
+                ->schema([
+                    TextInput::make('nama_barang')
+                        ->label('Nama Barang')
+                        ->required(),
+                    TextInput::make('stock')
+                        ->label('Stok Tersedia')
+                        ->required(),
+                    FileUpload::make('foto')
+                        ->image()
+                        ->label('Foto Barang')
+                        ->directory('foto-barang')
+                        ->required(),
+                    Select::make('kategori_barang')
+                        ->options([
+                            'Elektronik' => 'Elektronik',
+                            'Non-Elektronik' => 'Non-Elektronik',
+                        ])
+                        ->required()
+                ])
             ]);
     }
 
@@ -51,15 +65,16 @@ class BarangResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                ImageColumn::make('foto')
+                    ->label('Foto Barang'),
+                TextColumn::make('nama_barang')
                     ->label('Nama Barang')
                     ->searchable(),
                 TextColumn::make('stock')
                     ->label('Stok Tersedia')
                     ->sortable(),
-                TextColumn::make('description')
-                    ->label('Deskripsi')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('kategori_barang')
+                    ->label('Kategori Barang')
             ])
             ->filters([
                 //

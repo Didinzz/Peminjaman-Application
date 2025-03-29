@@ -12,14 +12,15 @@ class Peminjaman extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'peminjamen';
     protected $fillable = [
-        'nama_peminjam',
+        'user_id',
         'tanggal_pinjam',
         'tanggal_kembali',
-        'barang_id',
         'status_peminjaman',
-        'jumlah_pinjaman',
-        'bukti_peminjaman',
         'keterangan',
+        'surat_peminjaman',
+        'foto_pengembalian',
+        'tanggal_dikembalikan',
+        'keterangan_dikembalikan',
     ];
 
     protected $casts = [
@@ -27,24 +28,31 @@ class Peminjaman extends Model
         'tanggal_kembali' => 'datetime',
     ];
 
-    public function barang()
-    {
-        return $this->belongsTo(Barang::class, 'barang_id', 'id');
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    
+
+    public function detailPeminjaman(){
+        return $this->hasMany(DetailPeminjaman::class, 'peminjaman_id');
     }
 
     //add observer
     protected static function booted()
     {
         static::updating(function ($peminjaman) {
-            if ($peminjaman->isDirty('bukti_peminjaman')) {
-                Storage::disk('public')->delete($peminjaman->getOriginal('bukti_peminjaman'));
+            if ($peminjaman->isDirty('surat_peminjaman')) {
+                Storage::disk('public')->delete($peminjaman->getOriginal('surat_peminjaman'));
             }
         });
         
         //add delete event
         static::deleted(function ($peminjaman) {
             //delete file from disk
-            Storage::disk('public')->delete($peminjaman->bukti_peminjaman);
+            Storage::disk('public')->delete($peminjaman->surat_peminjaman);
         });
     }
+
+    
 }

@@ -7,13 +7,18 @@ use App\Filament\Resources\PeminjamanResource\RelationManagers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,6 +28,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,39 +44,91 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationGroup = 'Management Peminjaman';
 
+    protected function validateAndUpdateStock(array $data): array
+    {
+        $barang = Barang::find($data['barang_id']);
+
+        if (!$barang) {
+            Notification::make()
+                ->title('Barang tidak ditemukan.')
+                ->danger()
+                ->send();
+            return $data;
+        }
+
+        if ($barang->stock < $data['jumlah_pinjaman']) {
+            Notification::make()
+                ->title("Stok tidak mencukupi untuk barang {$barang->nama_barang}.")
+                ->danger()
+                ->send();
+            return $data;
+        }
+
+        // Kurangi stok barang sebelum disimpan
+        $barang->decrement('stock', $data['jumlah_pinjaman']);
+
+        return $data;
+    }
 
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Select::make('barang_id')
-                    ->live()
-                    ->afterStateUpdated(function (string $context, $state, callable $set) {
-                        $stockTersedia = Barang::find($state);
-                        if ($stockTersedia) {
-                            $set('stock_tersedia', $stockTersedia->stock);
-                        }
-                    })
-                    ->label('Barang')
-                    ->required()
-                    ->relationship('barang', 'name'),
-                TextInput::make('stock_tersedia')
-                    ->disabled()
-                    ->label('Stock Tersedia'),
-                TextInput::make('jumlah_pinjaman')
-                    ->label('Jumlah Pinjaman')
-                    ->required(),
+
+                Repeater::make('detailPeminjaman')
+                    ->label('Barang Dipinjam')
+                    ->addActionLabel('Tambah Barang')
+                    ->relationship()
+                    ->columnSpan(2)
+                    ->schema([
+                        Select::make('barang_id')
+                            ->reactive()
+                            ->relationship('barang', 'nama_barang')
+                            ->afterStateUpdated(function (string $context, $state, callable $set) {
+                                $barang = Barang::find($state);
+                                if ($barang) {
+                                    $set('stok_tersedia', $barang->stock);
+                                    $set('jumlah_pinjaman', null);
+                                }
+                            })
+                            ->label('Barang')
+                            ->required(),
+
+                        TextInput::make('stok_tersedia')
+                            ->disabled()
+                            ->label('Stok Tersedia'),
+
+                        TextInput::make('jumlah_pinjaman')
+                            ->label('Jumlah Pinjaman')
+                            ->required()
+                            ->numeric()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $stockTersedia = $get('stok_tersedia');
+
+                                if ($state > $stockTersedia) {
+                                    $set('jumlah_pinjaman', $stockTersedia);
+                                    Notification::make()
+                                        ->title('Jumlah Pinjaman Melebihi Stok Tersedia')
+                                        ->danger()
+                                        ->send();
+                                }
+                            }),
+                    ])
+                    ->columns(3),
+
                 DatePicker::make('tanggal_pinjam')
                     ->label('Tanggal Peminjaman')
                     ->required(),
                 DatePicker::make('tanggal_kembali')
                     ->label('Tanggal Pengembalian')
-                    ->after('tanggal_pinjam')
+                    ->afterOrEqual('tanggal_pinjam')
+                    ->validationMessages(['after_or_equal' => 'Tanggal pengembalian harus setelah tanggal peminjaman.'])
                     ->required(),
-                FileUpload::make('bukti_peminjaman')
-                    ->label('Bukti Peminjaman')
-                    ->directory('buktiPeminjaman')
+                FileUpload::make('surat_peminjaman')
+                    ->label('Surat Peminjaman')
+                    ->directory('surat-peminjaman')
                     ->required(),
                 Textarea::make('keterangan')
                     ->columnSpan(2)
@@ -82,16 +140,30 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            // ->query(Peminjaman::where('status_peminjaman', 'disetujui'))
+            ->query(Peminjaman::where('status_peminjaman', 'diajukan'))
+            ->emptyStateHeading('Belum ada pengajuan peminjaman')
+            ->emptyStateDescription('Belum ada pengajuan peminjaman yang dilakukan')
             ->columns([
+                TextColumn::make('user.name')
+                    ->hidden(!Gate::allows('decide_peminjaman'))
+                    ->searchable()
+                    ->label('Peminjam'),
+
+                TextColumn::make('jumlah_pinjaman')
+                    ->label('Jumlah Pinjaman'),
+
                 TextColumn::make('tanggal_pinjam')
                     ->date('d F')
                     ->label('Tanggal Peminjaman'),
+
                 TextColumn::make('tanggal_kembali')
                     ->date('d F')
                     ->label('Tanggal Pengembalian'),
-                TextColumn::make('barang.name')
-                    ->label('Barang'),
+
+                TextColumn::make('barang_dipinjam') // Menampilkan banyak barang dalam satu kolom
+                    ->label('Barang Dipinjam')
+                    ->formatStateUsing(fn($record) => $record->detailPeminjaman->pluck('barang.nama_barang')->join(', ')),
+
                 TextColumn::make('status_peminjaman')
                     ->badge()
                     ->formatStateUsing(fn($state): string => str()->headline($state))
@@ -101,8 +173,8 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                         'disetujui' => 'success',
                         'ditolak' => 'danger',
                     }),
-
             ])
+
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
@@ -196,7 +268,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             'delete_any',
             'force_delete',
             'force_delete_any',
-            'decide'
+            'decide',
         ];
     }
 }

@@ -105,9 +105,4 @@ class PeminjamanPolicy
     {
         return $user->can('reorder_peminjaman');
     }
-
-    public function decide(User $user): bool
-    {
-        return $user->can('decide_peminjaman');
-    }
 }

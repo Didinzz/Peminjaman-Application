@@ -46,29 +46,25 @@ class UserResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true),
                     Forms\Components\TextInput::make('password')
-                        ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                        ->visible(fn($livewire) => $livewire instanceof CreateUser)
-                        // ->rule(Password::default())
                         ->password()
-                        ->required(),
+                        ->dehydrated(fn($state) => filled($state))
+                        ->required(fn(string $context): bool => $context === 'create'),
                     Select::make('role')
                         ->required()
                         ->relationship('roles', 'name')
                 ]),
                 Section::make('User New Password')
-                ->visible(fn($livewire) => $livewire instanceof EditUser)
-                ->schema([
-                    TextInput::make('new_password')
-                    ->nullable()
-                    ->password()
-                    ->visible(fn($livewire) => $livewire instanceof EditUser),
-                    // ->rule(Password::default()),
-                    TextInput::make('new_password_confirmation')
-                    ->password()
-                    ->same('new_password')
-                    ->requiredWith('new_password')
                     ->visible(fn($livewire) => $livewire instanceof EditUser)
-                ])
+                    ->schema([
+                        TextInput::make('new_password')
+                            ->nullable()
+                            ->password(),
+                            // ->rule(Password::default()),
+                        TextInput::make('new_password_confirmation')
+                            ->password()
+                            ->same('new_password')
+                            ->requiredWith('new_password')
+                    ])
             ]);
     }
 

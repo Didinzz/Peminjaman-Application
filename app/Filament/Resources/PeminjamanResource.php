@@ -7,11 +7,12 @@ use App\Filament\Resources\PeminjamanResource\RelationManagers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Carbon\Carbon;
+use Dom\Text;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -20,11 +21,20 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Group as ComponentsGroup;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Section as ComponentsSection;
+use Filament\Infolists\Components\Split;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -116,7 +126,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Peminjaman::where('status_peminjaman', 'diajukan'))
+            // ->query(Peminjaman::where('status_peminjaman', 'diajukan'))
             ->emptyStateHeading('Belum ada pengajuan peminjaman')
             ->emptyStateDescription('Belum ada pengajuan peminjaman yang dilakukan')
             ->columns([
@@ -124,22 +134,18 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     ->hidden(!Gate::allows('decide_peminjaman'))
                     ->searchable()
                     ->label('Peminjam'),
-
-                TextColumn::make('jumlah_pinjaman')
-                    ->label('Jumlah Pinjaman'),
-
+                ImageColumn::make('detailPeminjaman.barang.foto')
+                    ->circular()
+                    ->stacked()
+                    ->limit(2)
+                    ->limitedRemainingText()
+                    ->label('Barang'),
                 TextColumn::make('tanggal_pinjam')
                     ->date('d F')
                     ->label('Tanggal Peminjaman'),
-
                 TextColumn::make('tanggal_kembali')
                     ->date('d F')
                     ->label('Tanggal Pengembalian'),
-
-                TextColumn::make('barang_dipinjam') // Menampilkan banyak barang dalam satu kolom
-                    ->label('Barang Dipinjam')
-                    ->formatStateUsing(fn($record) => $record->detailPeminjaman->pluck('barang.nama_barang')->join(', ')),
-
                 TextColumn::make('status_peminjaman')
                     ->badge()
                     ->formatStateUsing(fn($state): string => str()->headline($state))
@@ -148,6 +154,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                         'diajukan' => 'warning',
                         'disetujui' => 'success',
                         'ditolak' => 'danger',
+                        'dikembalikan' => 'primary',
                     }),
             ])
 
@@ -157,10 +164,11 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
 
             ->actions([
                 ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
                     Action::make('bukti_peminjaman')
                         ->label('Surat')
                         // ->color('info')
-                        ->icon('heroicon-o-eye')
+                        ->icon('heroicon-o-document-text')
                         ->modalHeading('Lihat Bukti Peminjaman')
                         ->hidden(fn(Peminjaman $record) => !$record->surat_peminjaman)
                         ->url(fn(Peminjaman $record) => Storage::url($record->surat_peminjaman), true) // Open in new tab
@@ -196,10 +204,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                                 ->send();
                         })
                         ->requiresConfirmation(),
-
-                    // Tables\Actions\EditAction::make(),
                 ])
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -223,6 +228,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
         return [
             'index' => Pages\ListPeminjamen::route('/'),
             'create' => Pages\CreatePeminjaman::route('/create'),
+            'view' => Pages\ViewPengajuanPeminjaman::route('/{record}'),
             'edit' => Pages\EditPeminjaman::route('/{record}/edit'),
         ];
     }
@@ -252,5 +258,76 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             'force_delete_any',
             'decide',
         ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                RepeatableEntry::make('detailPeminjaman')
+                    ->grid(2)
+                    ->label('Barang Dipinjam')
+                    ->columnSpanFull()
+                    ->schema([
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    ComponentsGroup::make([
+                                        TextEntry::make('barang.nama_barang')
+                                            ->label('Nama Barang'),
+                                        TextEntry::make('barang.kategori_barang')
+                                            ->label('Tipe Barang'),
+                                        TextEntry::make('jumlah_pinjaman')
+                                            ->label('Jumlah Pinjaman'),
+                                    ]),
+                                    ImageEntry::make('barang.foto')
+                                        ->label('Foto Barang')
+                                ])
+                        ])
+                    ]),
+                ComponentsSection::make('Peminjaman')
+
+                    ->schema([
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    ComponentsGroup::make([
+                                        TextEntry::make('user.name')
+                                            ->label('Nama Peminjam'),
+                                        TextEntry::make('tanggal_pinjam')
+                                            ->since()
+                                            ->label('Tanggal Peminjaman'),
+                                        TextEntry::make('tanggal_kembali')
+                                            ->since()
+                                            ->label('Tanggal Pengembalian'),
+                                    ]),
+                                    ComponentsGroup::make([
+                                        TextEntry::make('status_peminjaman')
+                                            ->badge()
+                                            ->formatStateUsing(fn($state): string => str()->headline($state))
+                                            ->color(fn(string $state): string => match ($state) {
+                                                'diajukan' => 'warning',
+                                                'disetujui' => 'success',
+                                                'ditolak' => 'danger',
+                                                'dikembalikan' => 'primary',
+                                            })
+                                            ->label('Status Peminjaman'),
+                                        TextEntry::make('tanggal_dikembalikan')
+                                            ->default('Belum dikembalikan')
+                                            ->label('Tanggal Dikembalikan'),
+                                        ImageEntry::make('foto_pegembalian')
+                                            ->hidden(fn($record): bool => $record->status_peminjaman !== 'dikembalikan')
+                                            ->label('Foto Pengembalian')
+                                    ]),
+                                ])
+                        ]),
+                        ComponentsSection::make('Alasan Peminjaman')
+                            ->schema([
+                                TextEntry::make('keterangan')
+                            ])
+                    ])
+
+
+            ]);
     }
 }

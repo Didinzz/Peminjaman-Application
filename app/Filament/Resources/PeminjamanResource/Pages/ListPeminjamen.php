@@ -21,8 +21,7 @@ class ListPeminjamen extends ListRecords
     public function getTabs(): array
     {
         return [
-            'diajukan' => Tab::make('Di Ajukan')
-            ->hidden(),
+            'diajukan' => Tab::make('Di Ajukan'),
             'disetujui' => Tab::make('Disetujui'),
             'ditolak' => Tab::make('Ditolak'),
             'dikembalikan' => Tab::make('Dikembalikan'),

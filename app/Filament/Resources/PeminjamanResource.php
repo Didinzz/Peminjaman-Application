@@ -14,6 +14,7 @@ use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -126,12 +127,11 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            // ->query(Peminjaman::where('status_peminjaman', 'diajukan'))
             ->emptyStateHeading('Belum ada pengajuan peminjaman')
             ->emptyStateDescription('Belum ada pengajuan peminjaman yang dilakukan')
             ->columns([
                 TextColumn::make('user.name')
-                    ->hidden(!Gate::allows('decide_peminjaman'))
+                    ->hidden(!Gate::allows('all_peminjaman'))
                     ->searchable()
                     ->label('Peminjam'),
                 ImageColumn::make('detailPeminjaman.barang.foto')
@@ -150,6 +150,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     ->badge()
                     ->formatStateUsing(fn($state): string => str()->headline($state))
                     ->label('Status')
+                    ->description(fn(Peminjaman $record): string => $record->ketarangan_ditolak ?: '')
                     ->color(fn(string $state): string => match ($state) {
                         'diajukan' => 'warning',
                         'disetujui' => 'success',
@@ -167,12 +168,55 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Action::make('bukti_peminjaman')
                         ->label('Surat')
-                        // ->color('info')
                         ->icon('heroicon-o-document-text')
+                        ->color('primary')
                         ->modalHeading('Lihat Bukti Peminjaman')
-                        ->hidden(fn(Peminjaman $record) => !$record->surat_peminjaman)
                         ->url(fn(Peminjaman $record) => Storage::url($record->surat_peminjaman), true) // Open in new tab
                         ->openUrlInNewTab(),
+                    Action::make('dikembalikan')
+                        ->label('Pengembalian')
+                        ->icon('heroicon-s-arrow-path-rounded-square')
+                        ->color('info')
+                        ->modalHeading('Konfirmasi Pengembalian')
+                        ->hidden(fn(Peminjaman $record) =>
+                        $record->status_peminjaman !== 'disetujui' || !Gate::allows('decide_pengembalian_peminjaman'))
+                        ->form([
+                            Section::make()
+                                ->columns(2)
+                                ->schema([
+                                    DatePicker::make('tanggal_dikembalikan')
+                                        ->label('Tanggal Dikembalikan')
+                                        ->required(),
+                                    FileUpload::make('foto_pegembalian')
+                                        ->image()
+                                        ->label('Foto Pengembalian')
+                                        ->directory('foto-pengembalian')
+                                        ->required(),
+                                ])
+                        ])
+                        ->action(function (Peminjaman $record, array $data) {
+                            // simpan udpate data pengembalian
+                            $record->update([
+                                'status_peminjaman' => 'dikembalikan',
+                                'tanggal_dikembalikan' => $data['tanggal_dikembalikan'],
+                                'foto_pegembalian' => $data['foto_pegembalian'],
+                            ]);
+
+                            // Loop melalui detail peminjaman dan kembalikan stok barang
+                            foreach ($record->detailPeminjaman as $detail) {
+                                $barang = $detail->barang;
+                                if ($barang) {
+                                    $barang->update([
+                                        'stock' => $barang->stock + $detail->jumlah_pinjaman,
+                                    ]);
+                                }
+                            }
+                            // Notifikasi sukses
+                            Notification::make()
+                                ->title('Peminjaman Dikembalikan')
+                                ->success()
+                                ->send();
+                        }),
                     Action::make('approve')
                         ->label('Setuju')
                         ->icon('heroicon-o-check-circle')
@@ -195,15 +239,34 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->hidden(fn(Model $record) => $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
-                        ->action(function (Model $record) {
-                            $record->update(['status_peminjaman' => 'ditolak']);
+                        ->modalHeading('Konfirmasi Tolak Peminjaman')
+                        ->form([
+                            Textarea::make('ketarangan_ditolak')
+                                ->label('Alasan Penolakan')
+                                ->required()
+                        ])
+                        ->action(function (Model $record, array $data) {
+                            // simpan update data penolakan
+                            $record->update([
+                                'status_peminjaman' => 'ditolak',
+                                'ketarangan_ditolak' => $data['ketarangan_ditolak']
+                            ]);
+
+                             // Loop melalui detail peminjaman dan kembalikan stok barang
+                             foreach ($record->detailPeminjaman as $detail) {
+                                $barang = $detail->barang;
+                                if ($barang) {
+                                    $barang->update([
+                                        'stock' => $barang->stock + $detail->jumlah_pinjaman,
+                                    ]);
+                                }
+                            }
 
                             Notification::make()
                                 ->title('Peminjaman Ditolak')
-                                ->danger()
+                                ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation(),
                 ])
             ])
             ->bulkActions([
@@ -236,6 +299,10 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->when(
+                !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
+                fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
+            )
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
@@ -257,6 +324,8 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             'force_delete',
             'force_delete_any',
             'decide',
+            'all',
+            'decide_pengembalian',
         ];
     }
 

@@ -6,6 +6,7 @@ use App\Filament\Resources\PeminjamanResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListPeminjamen extends ListRecords
 {
@@ -21,10 +22,12 @@ class ListPeminjamen extends ListRecords
     public function getTabs(): array
     {
         return [
-            'diajukan' => Tab::make('Di Ajukan'),
-            'disetujui' => Tab::make('Disetujui'),
-            'ditolak' => Tab::make('Ditolak'),
-            'dikembalikan' => Tab::make('Dikembalikan'),
+            'Semua' => Tab::make('Semua')
+            ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status_peminjaman', ['diajukan', 'disetujui'])),
+            'Disetujui' => Tab::make('Disetujui')
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('status_peminjaman', 'disetujui')),
+            'Riwayat' => Tab::make('Riwayat Pengajuan')
+            ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status_peminjaman', ['ditolak', 'dikembalikan'])),
         ];
     }
 }

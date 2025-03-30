@@ -18,9 +18,9 @@ class Peminjaman extends Model
         'status_peminjaman',
         'keterangan',
         'surat_peminjaman',
-        'foto_pengembalian',
         'tanggal_dikembalikan',
-        'keterangan_dikembalikan',
+        'ketarangan_ditolak',
+        'foto_pegembalian'
     ];
 
     protected $casts = [
@@ -51,6 +51,7 @@ class Peminjaman extends Model
         static::deleted(function ($peminjaman) {
             //delete file from disk
             Storage::disk('public')->delete($peminjaman->surat_peminjaman);
+            Storage::disk('public')->delete($peminjaman->foto_pegembalian);
         });
     }
 

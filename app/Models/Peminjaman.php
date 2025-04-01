@@ -48,10 +48,12 @@ class Peminjaman extends Model
         });
         
         //add delete event
-        static::deleted(function ($peminjaman) {
+        static::forceDeleted(function ($peminjaman) {
             //delete file from disk
             Storage::disk('public')->delete($peminjaman->surat_peminjaman);
-            Storage::disk('public')->delete($peminjaman->foto_pegembalian);
+            if ($peminjaman->foto_pegembalian != null) {
+                Storage::disk('public')->delete($peminjaman->foto_pegembalian);
+            }
         });
     }
 

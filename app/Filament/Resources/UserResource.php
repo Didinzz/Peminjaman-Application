@@ -48,6 +48,7 @@ class UserResource extends Resource
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->dehydrated(fn($state) => filled($state))
+                        ->visible(fn($livewire) => $livewire instanceof CreateUser)
                         ->required(fn(string $context): bool => $context === 'create'),
                     Select::make('role')
                         ->required()

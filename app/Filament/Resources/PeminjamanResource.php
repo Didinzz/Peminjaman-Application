@@ -7,21 +7,14 @@ use App\Filament\Resources\PeminjamanResource\RelationManagers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Carbon\Carbon;
-use Dom\Text;
-use Filament\Facades\Filament;
-use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group as ComponentsGroup;
 use Filament\Infolists\Components\ImageEntry;
@@ -41,7 +34,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -49,7 +41,8 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Peminjaman::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-folder';
+
     protected static ?string $navigationLabel = 'Pengajuan';
 
     protected static ?string $label = 'Pengajuan';
@@ -252,8 +245,8 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                                 'ketarangan_ditolak' => $data['ketarangan_ditolak']
                             ]);
 
-                             // Loop melalui detail peminjaman dan kembalikan stok barang
-                             foreach ($record->detailPeminjaman as $detail) {
+                            // Loop melalui detail peminjaman dan kembalikan stok barang
+                            foreach ($record->detailPeminjaman as $detail) {
                                 $barang = $detail->barang;
                                 if ($barang) {
                                     $barang->update([
@@ -364,10 +357,10 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                                         TextEntry::make('user.name')
                                             ->label('Nama Peminjam'),
                                         TextEntry::make('tanggal_pinjam')
-                                            ->since()
+                                            ->date('d M Y')
                                             ->label('Tanggal Peminjaman'),
                                         TextEntry::make('tanggal_kembali')
-                                            ->since()
+                                            ->date('d M Y')
                                             ->label('Tanggal Pengembalian'),
                                     ]),
                                     ComponentsGroup::make([

@@ -105,4 +105,17 @@ class PeminjamanPolicy
     {
         return $user->can('reorder_peminjaman');
     }
+
+    public function decide(User $user){
+        return $user->can('decide_peminjaman');
+    }
+
+    public function all(User $user){    
+        return $user->can('all_peminjaman');
+    }
+
+    public function decidePengembalian(User $user){
+        return $user->can('decide_pengembalian_peminjaman');
+    }
+
 }

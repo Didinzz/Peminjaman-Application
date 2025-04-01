@@ -21,4 +21,9 @@ class EditBarang extends EditRecord
     {
         return static::getResource()::getUrl('index');
     }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Barang Updated';
+    }
 }

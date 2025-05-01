@@ -1,19 +1,31 @@
 
-ADMIN
-    <!-- - buat akun user dan role peminjam -->
-    <!-- - input data barang (nama, foto, jumlah, jenis barang) -->
-    <!-- - button barang dikembalikan (form foto barang dikembalikan & tanggal dikembalikan) -->
-    <!-- - status dikembalikan/ditoak stok barang dikembalikan -->
-    - delete file only force delete
+       Revisi komas 
+<!-- 1. tambahkan bukti foto ketika barang yang di pinjam telah di serahkan oleh peminjam (petugas ) -->
+<!-- 2. tambahkan pembeda Antra tanggal pengajuan  peminjaman di input dengan tanggal pemakaian ketika barang akan di gunakan  -->
+<!-- 3. tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yg di pinjam d cantumkan alasan kenapa di batalkan peminjaman secara tiba2  -->
+<!-- 4. tambakan from pemakaian di ajukan peminjaman barang harus di ajukan dua hari sebelum di pinjam  -->
+<!-- 5. tambahkan opsi status barang (alasan) pengambilan ketika peminjam mengembalikan barang  -->
+<!-- 6. Sertakan nama petugas yang memberikan barang ke peminjam dan jga ketika pengambilan barang sertakan foto petugas dan barang  -->
+<!-- 7. Tambalan 3 opsi yaitu barang baik, rusak tapi bisa di pakai , rusak sudah tidak bisa di pakai -->
+<!-- 8. tambahkan status peminjaman "terlambat dikembalikan" jika peminjam terlambat mengembalikan barang -->
+
+
+
+ADMIN/petugas
+   - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil
+   - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam.
+   - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan
+   - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2
+   - inventaris barang bisa ditambah dengan kondisi barang nantinya akan difilter tapi yang tampil masuk distock hanya barang bagus saja, nanti untuk barang yang kondisi rusak bisa dipakai dan rusak tidak bisa dipakai itu difilter dan ketahuan ada berapa
+
 
 Wakasarpras
-    <!-- - Menerima peminjaman barang dari peminjam -->
-    <!-- - Menyetujui/Menolak peminjaman barang -->
-    <!-- - Menolak Peminjaman dan alasan -->
+    - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam, ketika pembatalan disetuji baru stok barang kembali ke stok barang.
     
 Peminjam
-    <!-- - Melakukan pengisian peminjaman barang (nama barang apa saja yang dipinjam, jumlah pinjaman, tanggal peminjaman, tanggal pengembalian, surat peminjaman) -->
-    <!-- - Menunggu verifikasi peminjaman barang dari wakasarpras -->
+    -tambahkan/ubah tanggal pengajuan menjadi tanggal kapan pemakaiannya dan buat validasi jika mengisi tanggal pemakaian itu tidak boleh kurang dari 2 hari tanggal pengajuan dibuat, contohnya pengajuan dibuat hari senin, maka tanggal pemakaian tidak boleh dipilih tanggal pemakaian hari selasa, hanya bisa dimulai dipilih hari rabu
+    - tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yang dipinjam dan validasi pembatalan hanya bisa dilakukan ketika status barang telah diajukan dan disetuji oleh petugas, serta berikan alasan pembatalan peminjaman
+
 
     Tabel Peminjaman
         - user id
@@ -30,3 +42,5 @@ Peminjam
         - barang id
         - stok tersedia
         -jumlah pinjaman
+
+ 

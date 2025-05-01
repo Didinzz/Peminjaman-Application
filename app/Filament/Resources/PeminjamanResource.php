@@ -64,7 +64,18 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     ->schema([
                         Select::make('barang_id')
                             ->reactive()
-                            ->relationship('barang', 'nama_barang')
+                            ->relationship(
+                                'barang',
+                                'nama_barang',
+                                modifyQueryUsing: function ($query, $get) {
+                                    // Ambil semua barang yang sudah dipilih
+                                    $selectedBarangIds = collect($get('detailPeminjaman'))->pluck('barang_id')->toArray();
+                
+                                    // Filter untuk menampilkan barang yang belum dipilih
+                                    return $query->where('stock', '>', 0)
+                                                 ->whereNotIn('id', $selectedBarangIds); // Hindari barang yang sudah dipilih
+                                }
+                            )
                             ->afterStateUpdated(function (string $context, $state, callable $set) {
                                 $barang = Barang::find($state);
                                 if ($barang) {
@@ -88,7 +99,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                                 if ($state > $stockTersedia) {
                                     $set('jumlah_pinjaman', $stockTersedia);
                                     Notification::make()
-                                        ->title('Jumlah Pinjaman Melebihi Stok Tersedia')
+                                        ->title('jumlah pinjaman melebihi stok')
                                         ->danger()
                                         ->send();
                                 }
@@ -100,11 +111,26 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                     ->schema([
                         DatePicker::make('tanggal_pinjam')
                             ->label('Tanggal Peminjaman')
+                            ->minDate(now()) // Tidak bisa pilih kemarin
+                            ->reactive()
+                            ->displayFormat('d F Y')
+                            ->native(false)
+                            ->suffixIcon('heroicon-o-calendar')
                             ->required(),
+
                         DatePicker::make('tanggal_kembali')
                             ->label('Tanggal Pengembalian')
-                            ->afterOrEqual('tanggal_pinjam')
-                            ->validationMessages(['after_or_equal' => 'Tanggal pengembalian harus setelah tanggal peminjaman.'])
+                            ->minDate(function (callable $get) {
+                                $tanggalPinjam = $get('tanggal_pinjam');
+                                return $tanggalPinjam ?? now(); // Jika belum pilih tanggal_pinjam, minimal hari ini
+                            })
+                            ->reactive()
+                            ->displayFormat('d F Y')
+                            ->native(false)
+                            ->suffixIcon('heroicon-o-calendar')
+                            ->validationMessages([
+                                'after_or_equal' => 'Tanggal pengembalian tidak boleh sebelum tanggal peminjaman.',
+                            ])
                             ->required(),
                         FileUpload::make('surat_peminjaman')
                             ->label('Surat Peminjaman')
@@ -278,7 +304,6 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [

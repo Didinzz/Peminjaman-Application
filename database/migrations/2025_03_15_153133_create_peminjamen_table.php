@@ -16,12 +16,17 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users', 'id')->cascadeOnUpdate()->cascadeOnDelete();
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali');
-            $table->enum('status_peminjaman', ['diajukan', 'disetujui', 'ditolak', 'dikembalikan'])->default('diajukan');
+            $table->enum('status_peminjaman', ['diajukan', 'disetujui', 'ditolak', 'barang_diambil', 'menunggu_pembatalan', 'dibatalkan', 'dikembalikan'])->default('diajukan');
             $table->text('keterangan')->nullable();
             $table->string('surat_peminjaman');
             $table->string('foto_pegembalian')->nullable();
             $table->date('tanggal_dikembalikan')->nullable();
             $table->string('ketarangan_ditolak')->nullable();
+            $table->string('foto_pengambilan')->nullable()->after('surat_peminjaman');
+            $table->string('nama_petugas_pengambilan')->nullable()->after('foto_pengambilan');
+            $table->string('nama_petugas_pengembalian')->nullable()->after('foto_pegembalian');
+            $table->text('alasan_pembatalan')->nullable()->after('ketarangan_ditolak');
+            $table->enum('status_pengembalian', ['tepat_waktu', 'terlambat'])->nullable()->after('nama_petugas_pengembalian');
             $table->softDeletes();
             $table->timestamps();
         });

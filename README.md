@@ -12,11 +12,11 @@
 
 
 ADMIN/petugas
-   - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil
-   - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam.
-   - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan
+   <!-- - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil --> untuk pengambilan dan pengembalian kurang di atur ulang shieldnya
+   <!-- - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan -->
    - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2
    - inventaris barang bisa ditambah dengan kondisi barang nantinya akan difilter tapi yang tampil masuk distock hanya barang bagus saja, nanti untuk barang yang kondisi rusak bisa dipakai dan rusak tidak bisa dipakai itu difilter dan ketahuan ada berapa
+   - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam.
 
 
 Wakasarpras
@@ -42,5 +42,8 @@ Peminjam
         - barang id
         - stok tersedia
         -jumlah pinjaman
+
+        Pertanyaan untuk asistensi
+        - apakah pengisian tanggal pengembalian boleh di isi sebelum tanggal hari ini? karena mengecega apabila petugas lupa melakukan konfirmasi pengembalian
 
  

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Filament\Resources\PeminjamanResource\Tables\Actions;
+
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+
+class TolakAction
+{
+    public static function make(): Action
+    {
+        return Action::make('tolak')
+            ->label('Tolak')
+            ->icon('heroicon-o-x-circle')
+            ->color('danger')
+            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
+            ->modalHeading('Konfirmasi Tolak Peminjaman')
+            ->form([
+                Textarea::make('ketarangan_ditolak')
+                    ->label('Alasan Penolakan')
+                    ->required()
+            ])
+            ->action(function (Model $record, array $data) {
+                // simpan update data penolakan
+                $record->update([
+                    'status_peminjaman' => 'ditolak',
+                    'ketarangan_ditolak' => $data['ketarangan_ditolak']
+                ]);
+
+                // Loop melalui detail peminjaman dan kembalikan stok barang
+                foreach ($record->detailPeminjaman as $detail) {
+                    $barang = $detail->barang;
+                    if ($barang) {
+                        $barang->update([
+                            'stock' => $barang->stock + $detail->jumlah_pinjaman,
+                        ]);
+                    }
+                }
+
+                Notification::make()
+                    ->title('Peminjaman Ditolak')
+                    ->success()
+                    ->send();
+            });
+    }
+}

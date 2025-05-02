@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nama_barang');
             $table->integer('stock');
+            $table->integer('stok_bagus')->default(0)->after('stock');
+            $table->integer('stok_rusak_ringan')->default(0);
+            $table->integer('stok_rusak_berat')->default(0);
             $table->string('foto');
             $table->enum('kategori_barang', ['Elektronik', 'Non-Elektronik']);
             $table->timestamps();

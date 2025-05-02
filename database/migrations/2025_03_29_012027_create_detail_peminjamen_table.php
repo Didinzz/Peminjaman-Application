@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barangs', 'id')->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('stok_tersedia');
             $table->integer('jumlah_pinjaman');
+            $table->integer('jumlah_masih_bagus')->nullable()->after('jumlah_pinjaman');
+            $table->integer('jumlah_rusak_ringan')->nullable()->after('jumlah_masih_bagus');
+            $table->integer('jumlah_rusak_berat')->nullable()->after('jumlah_rusak_ringan');
             $table->timestamps();
         });
     }

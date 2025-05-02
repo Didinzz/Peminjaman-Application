@@ -11,17 +11,7 @@ class Peminjaman extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'peminjamen';
-    protected $fillable = [
-        'user_id',
-        'tanggal_pinjam',
-        'tanggal_kembali',
-        'status_peminjaman',
-        'keterangan',
-        'surat_peminjaman',
-        'tanggal_dikembalikan',
-        'ketarangan_ditolak',
-        'foto_pegembalian'
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'tanggal_pinjam' => 'datetime',
@@ -31,8 +21,6 @@ class Peminjaman extends Model
     public function user(){
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-
-    
 
     public function detailPeminjaman(){
         return $this->hasMany(DetailPeminjaman::class, 'peminjaman_id');
@@ -51,9 +39,16 @@ class Peminjaman extends Model
         static::forceDeleted(function ($peminjaman) {
             //delete file from disk
             Storage::disk('public')->delete($peminjaman->surat_peminjaman);
+            // delete foto pengambilan
+            if ($peminjaman->foto_pengambilan != null) {
+                Storage::disk('public')->delete($peminjaman->foto_pengambilan);
+            }
+            // delete foto pegembalian
             if ($peminjaman->foto_pegembalian != null) {
                 Storage::disk('public')->delete($peminjaman->foto_pegembalian);
             }
+
+            
         });
     }
 

@@ -33,15 +33,15 @@ class DikembalikanAction
                 Section::make()
                     ->columns(1)
                     ->schema([
-                        // DatePicker::make('tanggal_dikembalikan')
-                        //     ->label('Tanggal Dikembalikan')
-                        //     ->required(),
-                        // FileUpload::make('foto_pegembalian')
-                        //     ->image()
-                        //     ->label('Foto Pengembalian')
-                        //     ->directory('foto-pengembalian')
-                        //     ->required(),
-                        Repeater::make('detailPeminjaman')
+                        DatePicker::make('tanggal_dikembalikan')
+                            ->label('Tanggal Dikembalikan')
+                            ->required(),
+                        FileUpload::make('foto_pegembalian')
+                            ->image()
+                            ->label('Foto Pengembalian')
+                            ->directory('foto-pengembalian')
+                            ->required(),
+                        Repeater::make('kondisi_barang')
                             ->label('Verifikasi Kondisi Barang')
                             ->schema([
                                 Grid::make()
@@ -95,46 +95,65 @@ class DikembalikanAction
             ])
             ->action(function (Peminjaman $record, array $data) {
 
-                // $tanggalDikembalian = \Carbon\Carbon::parse($data['tanggal_dikembalikan']);
-                // $tanggalKembali = \Carbon\Carbon::parse($record->tanggal_kembali);
+                $tanggalDikembalian = \Carbon\Carbon::parse($data['tanggal_dikembalikan']);
+                $tanggalKembali = \Carbon\Carbon::parse($record->tanggal_kembali);
+                $isTerlambat = $tanggalDikembalian->gt($tanggalKembali);
 
-                // $isTerlambat = $tanggalDikembalian->gt($tanggalKembali);
+                // Update data utama peminjaman
+                $record->update([
+                    'status_peminjaman' => 'dikembalikan',
+                    'tanggal_dikembalikan' => $data['tanggal_dikembalikan'],
+                    'nama_petugas_pengembalian' => auth()->user()->name,
+                    'foto_pegembalian' => $data['foto_pegembalian'],
+                    'status_pengembalian' => $isTerlambat ? 'terlambat' : 'tepat_waktu',
+                ]);
 
-                // simpan udpate data pengembalian
-                // $record->update([
-                //     'status_peminjaman' => 'dikembalikan',
-                //     'tanggal_dikembalikan' => $data['tanggal_dikembalikan'],
-                //     'nama_petugas_pengembalian' => auth()->user()->name,
-                //     'foto_pegembalian' => $data['foto_pegembalian'],
-                //     'status_pengembalian' => $isTerlambat ? 'terlambat' : 'tepat_waktu',
-                // ]);
+                // Loop input kondisi barang dan update stok + simpan ke detail
+                foreach ($data['kondisi_barang'] as $kondisiBarang) {
+                    $barangId = $kondisiBarang['barang']['id'] ?? null;
 
-                // Loop melalui detail peminjaman dan kembalikan stok barang
-                foreach ($record->detailPeminjaman as $detail) {
-                    $barang = Barang::find($detail['barang_id']);
-                    dd($detail);
-                    // dd($barang->nama_barang);
-                    if ($barang) {
-                        // $barang->update([
-                        //     ' stok_bagus' => $barang->stok_bagus + $detail->jumlah_masih_bagus,
-                        //     'stock' => $barang->stock + $detail->jumlah_pinjaman,
-                        // ]);
-                        // dd($barang->nama_barang, $barang->stok_bagus);
+                    if ($barangId) {
+                        $barang = Barang::find($barangId);
+
+                        if ($barang) {
+                            $jumlahBagus = intval($kondisiBarang['jumlah_masih_bagus']);
+                            $jumlahRusakRingan = intval($kondisiBarang['jumlah_rusak_ringan']);
+                            $jumlahRusakBerat = intval($kondisiBarang['jumlah_rusak_berat']);
+                            $totalKembali = $jumlahBagus + $jumlahRusakRingan;
+
+                            // Update stok barang
+                            $barang->update([
+                                'stock' => $barang->stock + $totalKembali,
+                                'stok_bagus' => $barang->stok_bagus + $jumlahBagus,
+                                'stok_rusak_ringan' => $barang->stok_rusak_ringan + $jumlahRusakRingan,
+                                'stok_rusak_berat' => $barang->stok_rusak_berat + $jumlahRusakBerat,
+                            ]);
+
+                            // Simpan kondisi pengembalian ke detail_peminjaman
+                            $record->detailPeminjaman()
+                                ->where('barang_id', $barangId)
+                                ->update([
+                                    'jumlah_masih_bagus' => $jumlahBagus,
+                                    'jumlah_rusak_ringan' => $jumlahRusakRingan,
+                                    'jumlah_rusak_berat' => $jumlahRusakBerat,
+                                ]);
+                        }
                     }
                 }
-                // Notifikasi sukses
-                // Notification::make()
-                //     ->title('Peminjaman Dikembalikan')
-                //     ->success()
-                //     ->send();
 
-                // notifikasi jika peminjaman terlambat
-                // if ($isTerlambat) {
-                //     Notification::make()
-                //         ->title('Peminjaman Terlambat dikembalikan')
-                //         ->warning()
-                //         ->send();
-                // }
+                // Notifikasi sukses
+                Notification::make()
+                    ->title('Peminjaman berhasil dikembalikan')
+                    ->success()
+                    ->send();
+
+                // Notifikasi jika terlambat
+                if ($isTerlambat) {
+                    Notification::make()
+                        ->title('Pengembalian dilakukan setelah tanggal kembali')
+                        ->warning()
+                        ->send();
+                }
             });
     }
 

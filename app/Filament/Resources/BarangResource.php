@@ -38,28 +38,40 @@ class BarangResource extends Resource
         return $form
             ->schema([
                 Section::make('Tambah Barang')
-                ->columns(2)
-                ->schema([
-                    TextInput::make('nama_barang')
-                        ->label('Nama Barang')
-                        ->required(),
-                    TextInput::make('stock')
-                        ->label('Stok Tersedia')
-                        ->required(),
-                    FileUpload::make('foto')
-                        ->image()
-                        ->label('Foto Barang')
-                        ->directory('foto-barang')
-                        ->required(),
-                    Select::make('kategori_barang')
-                        ->options([
-                            'Elektronik' => 'Elektronik',
-                            'Non-Elektronik' => 'Non-Elektronik',
-                        ])
-                        ->required()
-                ])
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('nama_barang')
+                            ->label('Nama Barang')
+                            ->required(),
+                        // TextInput::make('stock')
+                        //     ->label('Stok Tersedia')
+                        //     ->required(),
+                        TextInput::make('stok_bagus')
+                            ->label('Stok Bagus')
+                            ->required(),
+                        TextInput::make('stok_rusak_ringan')
+                            ->label('Stok Rusak Ringan')
+                            ->required(),
+                        TextInput::make('stok_rusak_berat')
+                            ->label('Stok Rusak Berat')
+                            ->required(),
+                        Select::make('kategori_barang')
+                            ->options([
+                                'Elektronik' => 'Elektronik',
+                                'Non-Elektronik' => 'Non-Elektronik',
+                            ])
+                            ->required(),
+                        FileUpload::make('foto')
+                            ->columnSpan(2)
+                            ->image()
+                            ->label('Foto Barang')
+                            ->directory('foto-barang')
+                            ->required(),
+
+                    ])
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -73,8 +85,20 @@ class BarangResource extends Resource
                 TextColumn::make('stock')
                     ->label('Stok Tersedia')
                     ->sortable(),
+                TextColumn::make('stok_bagus')
+                    ->label('Masih bagus')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('stok_rusak_ringan')
+                    ->label('Masih Bisa Dipakai')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('stok_rusak_berat')
+                    ->label('Tidak bisa dipakai')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('kategori_barang')
-                    ->label('Kategori Barang')
+                    ->label('Kategori Barang'),
             ])
             ->filters([
                 //

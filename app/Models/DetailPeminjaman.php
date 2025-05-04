@@ -16,8 +16,9 @@ class DetailPeminjaman extends Model
     protected $guarded = [];
 
 
-    protected static function booted()
+    protected static function boot()
     {
+        parent::boot();
         //saat ada data baru dibuat, update stok barang
         static::created(function ($detailPeminjaman) {
             $barang = Barang::find($detailPeminjaman->barang_id);
@@ -60,8 +61,9 @@ class DetailPeminjaman extends Model
                 $jumlahPinjam = $detailPeminjaman->jumlah_pinjaman;
 
               
-                $barang->stock = $jumlahPinjam;
+                $barang->stock = $barang->stok_bagus + $barang->stok_rusak_ringan;
                 $barang->save();
+                dd($detailPeminjaman);
             }
         });
     }

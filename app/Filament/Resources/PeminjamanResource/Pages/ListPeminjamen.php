@@ -26,7 +26,7 @@ class ListPeminjamen extends ListRecords
     {
         return [
             'Semua' => Tab::make('Semua')
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status_peminjaman', ['diajukan', 'disetujui'])),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status_peminjaman', ['diajukan', 'disetujui', 'menunggu_pembatalan'])),
             'Dipinjam' => Tab::make('Dipinjam')
                 ->badge(Peminjaman::query()
                     ->when(
@@ -36,15 +36,6 @@ class ListPeminjamen extends ListRecords
                     ->where('status_peminjaman', 'barang_diambil')
                     ->count())
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('status_peminjaman', 'barang_diambil')),
-            'Riwayat' => Tab::make('Riwayat')
-                ->badge(Peminjaman::query()
-                    ->when(
-                        !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
-                        fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
-                    )
-                    ->whereIn('status_peminjaman', ['ditolak', 'dikembalikan'])
-                    ->count())
-                ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status_peminjaman', ['ditolak', 'dikembalikan'])),
         ];
     }
 }

@@ -25,8 +25,6 @@ class DikembalikanAction
     {
         return Action::make('dikembalikan')
             ->label('Pengembalian')
-            ->icon('heroicon-s-arrow-path-rounded-square')
-            ->color('info')
             ->modalHeading('Konfirmasi Pengembalian')
             ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'barang_diambil' || !Gate::allows('decide_pengembalian_peminjaman'))
             ->form([
@@ -35,6 +33,10 @@ class DikembalikanAction
                     ->schema([
                         DatePicker::make('tanggal_dikembalikan')
                             ->label('Tanggal Dikembalikan')
+                            ->minDate(now()->startOfDay())
+                            ->displayFormat('d F Y')
+                            ->native(false)
+                            ->suffixIcon('heroicon-s-calendar-days')
                             ->required(),
                         FileUpload::make('foto_pegembalian')
                             ->image()
@@ -150,7 +152,7 @@ class DikembalikanAction
                 // Notifikasi jika terlambat
                 if ($isTerlambat) {
                     Notification::make()
-                        ->title('Pengembalian dilakukan setelah tanggal kembali')
+                        ->title('Pengembalian terlambat')
                         ->warning()
                         ->send();
                 }

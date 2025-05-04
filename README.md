@@ -13,20 +13,25 @@
 
 ADMIN/petugas
    <!-- - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil --> untuk pengambilan dan pengembalian kurang di atur ulang shieldnya
-   <!-- - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan --> validasi tanggal pengembalian
-   <!-- - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2 --> tapi masih ada kendala pada  bagian hapus peminjaman dimana stok yang dipinjam kembali ke sesuai kondisi barang, dan yang terakhir adalah validasi tanggal di form
+   <!-- - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan validasi tanggal pengembalian -->
+   <!-- - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2 tapi masih ada kendala pada   validasi tanggal mengubah tanggal pengajuan menjadi tanggal pemakaian di form -->
+   <!-- - sesuaikan infolist -->
+
    - nanti kalau peminjaman yang diajukan lebih dari 1 hari dari tanggal pemakaian tidak diambil oleh peminjam, maka status akan berubah dibatalkan dengan alasan "barang tidak diambil oleh peminjam"
     
-   - inventaris barang bisa ditambah dengan kondisi barang nantinya akan difilter tapi yang tampil masuk distock hanya barang bagus saja, nanti untuk barang yang kondisi rusak bisa dipakai dan rusak tidak bisa dipakai itu difilter dan ketahuan ada berapa
-   - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam.
+   <!-- - inventaris barang bisa ditambah dengan kondisi barang nantinya akan difilter tapi yang tampil masuk distock hanya barang bagus saja, nanti untuk barang yang kondisi rusak bisa dipakai dan rusak tidak bisa dipakai itu difilter dan ketahuan ada berapa -->
+   <!-- - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam. -->
+   <!-- - jangan lupa perika pengembalian kondisi barang ketika peminjaman ditolak -->
+   <!-- - perbaiki tanggal pemakaian tidak bisa dihari yang paling minimal error field must be a date after or equal to  -->
+   <!-- - perbaiki fleksibilitas deskripsi -->
 
 
 Wakasarpras
-    - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam, ketika pembatalan disetuji baru stok barang kembali ke stok barang.
+    <!-- - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam, ketika pembatalan disetuji baru stok barang kembali ke stok barang. -->
     
 Peminjam
-    -tambahkan/ubah tanggal pengajuan menjadi tanggal kapan pemakaiannya dan buat validasi jika mengisi tanggal pemakaian itu tidak boleh kurang dari 2 hari tanggal pengajuan dibuat, contohnya pengajuan dibuat hari senin, maka tanggal pemakaian tidak boleh dipilih tanggal pemakaian hari selasa, hanya bisa dimulai dipilih hari rabu
-    - tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yang dipinjam dan validasi pembatalan hanya bisa dilakukan ketika status barang telah diajukan dan disetuji oleh petugas, serta berikan alasan pembatalan peminjaman
+    <!-- -tambahkan/ubah tanggal pengajuan menjadi tanggal kapan pemakaiannya dan buat validasi jika mengisi tanggal pemakaian itu tidak boleh kurang dari 2 hari tanggal pengajuan dibuat, contohnya pengajuan dibuat hari senin, maka tanggal pemakaian tidak boleh dipilih tanggal pemakaian hari selasa, hanya bisa dimulai dipilih hari rabu -->
+    <!-- - tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yang dipinjam dan validasi pembatalan hanya bisa dilakukan ketika status barang telah diajukan dan disetuji oleh petugas, serta berikan alasan pembatalan peminjaman --> jangan lupa validasi menggunakan shield dan cari cara untuk menghilangkan resource didalam shield
 
 
     Tabel Peminjaman

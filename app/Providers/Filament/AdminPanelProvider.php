@@ -32,6 +32,18 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Administrasi Peminjaman')
             ->colors([
                 'primary' => Color::Lime,
+                'orange' => Color::Orange,
+                'indigo' => Color::Indigo,
+                'teal' => Color::Teal,
+                'yellow' => Color::Yellow,
+                'blue' => Color::Blue,
+                'green' => Color::Green,
+                'red' => Color::Red,
+                'purple' => Color::Purple,
+                'sky' => Color::Sky,
+                'emerald' => Color::Emerald,
+                'rose' => Color::Rose,
+                'amber' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('peminjamen', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users', 'id')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->date('tanggal_pinjam');
+            $table->date('tanggal_pemakaian');
             $table->date('tanggal_kembali');
             $table->enum('status_peminjaman', ['diajukan', 'disetujui', 'ditolak', 'barang_diambil', 'menunggu_pembatalan', 'dibatalkan', 'dikembalikan'])->default('diajukan');
             $table->text('keterangan')->nullable();

@@ -7,20 +7,32 @@ use App\Filament\Resources\PeminjamanResource\Tables\Actions\BuktiPeminjamanActi
 use App\Filament\Resources\PeminjamanResource\Tables\Actions\DikembalikanAction;
 use App\Filament\Resources\PeminjamanResource\Tables\Actions\SetujuActoin;
 use App\Filament\Resources\PeminjamanResource\Tables\Actions\TolakAction;
+use App\Filament\Resources\PeminjamanResource\Tables\Actions\VerifikasiPengajuanPembatalanAction;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
+use PengajuanPembatalanAction;
 
 class PeminjamanTableActions
 {
     public static function group(): ActionGroup
     {
         return ActionGroup::make([
-            ViewAction::make(),
-            BuktiPeminjamanAction::make(),
-            BarangDiambilAction::make(),
-            DikembalikanAction::make(),
-            SetujuActoin::make(),
+            ViewAction::make()
+                ->label('Detail')
+                ->color('sky'),
+            BuktiPeminjamanAction::make()
+            ->color('indigo'),
+            BarangDiambilAction::make()
+            ->color('emerald'),
+            PengajuanPembatalanAction::make()
+            ->color('danger'),
+            DikembalikanAction::make()
+            ->color('green'),
+            SetujuActoin::make()
+            ->color('success'),
             TolakAction::make()
+            ->color('danger'),
+            VerifikasiPengajuanPembatalanAction::make()
         ]);
     }
 }

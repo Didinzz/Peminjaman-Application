@@ -33,6 +33,11 @@ class CreatePeminjaman extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
+    protected function getCreatedNotificationMessage(): ?string
+    {
+        return 'Peminjaman berhasil di ajukan';
+    }
+
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

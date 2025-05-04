@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PeminjamanResource\Tables\Actions;
 use App\Models\Peminjaman;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,6 @@ class BarangDiambilAction
         return Action::make('barang_diambil')
             ->label('Pengambilan')
             ->modalHeading('Konfirmasi Pengambilan Barang')
-            ->color('info')
             ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'disetujui' || !Gate::allows('decide_pengembalian_peminjaman'))
             ->form([
                 Section::make()
@@ -34,6 +34,11 @@ class BarangDiambilAction
                     'nama_petugas_pengambilan' => auth()->user()->name,
                     'foto_pengambilan' => $data['foto_pengambilan'],
                 ]);
+
+                Notification::make()
+                    ->title('Barang telah diambil')
+                    ->success()
+                    ->send();
             });
     }
 }

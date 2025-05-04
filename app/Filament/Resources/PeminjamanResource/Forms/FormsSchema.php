@@ -4,6 +4,7 @@ use App\Models\Barang;
 use Filament\Forms\Components\DatePicker;
 
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -77,28 +78,30 @@ class PeminjamanFromSchema
             Section::make('Detail Pengajuan')
                 ->columns(2)
                 ->schema([
-                    DatePicker::make('tanggal_pinjam')
-                        ->label('Tanggal Peminjaman')
-                        ->minDate(now()) // Tidak bisa pilih kemarin
+                    DatePicker::make('tanggal_pemakaian')
+                        ->label('Tanggal Pemakaian')
+                        ->minDate(now()->addDays(2)->startOfDay()) // Tidak bisa pilih kemarin
                         ->reactive()
                         ->displayFormat('d F Y')
                         ->native(false)
-                        ->suffixIcon('heroicon-o-calendar')
+                        ->suffixAction(
+                            Action::make('info')
+                                ->icon('heroicon-o-question-mark-circle')
+                                ->tooltip('Minimal pemakaian adalah 2 hari setelah membuat pengajuan.')
+                                ->color('primary')
+                        )
+                        ->prefixIcon('heroicon-o-calendar')
                         ->required(),
-
                     DatePicker::make('tanggal_kembali')
                         ->label('Tanggal Pengembalian')
                         ->minDate(function (callable $get) {
-                            $tanggalPinjam = $get('tanggal_pinjam');
-                            return $tanggalPinjam ?? now(); // Jika belum pilih tanggal_pinjam, minimal hari ini
+                            $tanggalPinjam = $get('tanggal_pemakaian');
+                            return optional($tanggalPinjam)->startOfDay() ?? now()->addDays(2)->startOfDay(); // Jika belum pilih tanggal_pemakaian, minimal hari ini
                         })
                         ->reactive()
                         ->displayFormat('d F Y')
                         ->native(false)
                         ->suffixIcon('heroicon-o-calendar')
-                        ->validationMessages([
-                            'after_or_equal' => 'Tanggal pengembalian tidak boleh sebelum tanggal peminjaman.',
-                        ])
                         ->required(),
                     FileUpload::make('surat_peminjaman')
                         ->label('Surat Peminjaman')

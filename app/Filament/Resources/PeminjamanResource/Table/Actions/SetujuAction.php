@@ -14,8 +14,6 @@ class SetujuActoin
     {
         return Action::make('approve')
             ->label('Setuju')
-            ->icon('heroicon-o-check-circle')
-            ->color('success')
             ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
             ->action(function (Model $record) {
                 $record->update(['status_peminjaman' => 'disetujui']);

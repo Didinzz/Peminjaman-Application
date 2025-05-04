@@ -15,8 +15,6 @@ class TolakAction
     {
         return Action::make('tolak')
             ->label('Tolak')
-            ->icon('heroicon-o-x-circle')
-            ->color('danger')
             ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
             ->modalHeading('Konfirmasi Tolak Peminjaman')
             ->form([
@@ -35,14 +33,15 @@ class TolakAction
                 foreach ($record->detailPeminjaman as $detail) {
                     $barang = $detail->barang;
                     if ($barang) {
-                        $barang->update([
-                            'stock' => $barang->stock + $detail->jumlah_pinjaman,
-                        ]);
+                        $barang->stok_bagus += $detail->jumlah_masih_bagus;
+                        $barang->stok_rusak_ringan += $detail->jumlah_rusak_ringan;
+                        $barang->stock = $barang->stok_bagus + $barang->stok_rusak_ringan;
+                        $barang->save();
                     }
                 }
 
                 Notification::make()
-                    ->title('Peminjaman Ditolak')
+                    ->title('Pengajuan Ditolaks')
                     ->success()
                     ->send();
             });

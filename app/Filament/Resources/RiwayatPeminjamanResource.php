@@ -2,53 +2,56 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PeminjamanResource\Actions\PeminjamanTableActions;
 use App\Filament\Resources\PeminjamanResource\Infolists\PeminjamanInfo;
-use App\Filament\Resources\PeminjamanResource\Pages;
 use App\Filament\Resources\PeminjamanResource\Tables\PeminjamanColumn;
+use App\Filament\Resources\RiwayatPeminjamanResource\Pages;
+use App\Filament\Resources\RiwayatPeminjamanResource\RelationManagers;
 use App\Models\Peminjaman;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Tables\Actions\ActionGroup;
+
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Gate;
-use PeminjamanFromSchema;
 
-class PeminjamanResource extends Resource implements HasShieldPermissions
+class RiwayatPeminjamanResource extends Resource
 {
     protected static ?string $model = Peminjaman::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
-
-    protected static ?string $navigationLabel = 'Pengajuan';
-
-    protected static ?string $label = 'Pengajuan';
-
-
     protected static ?string $navigationGroup = 'Management Peminjaman';
-
-
+    protected static ?string $label = 'Riwayat Peminjaman';
+    protected static ?string $navigationLabel = 'Riwayat';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     public static function form(Form $form): Form
     {
-        return $form->schema(PeminjamanFromSchema::make());
+        return $form
+            ->schema([
+                //
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->emptyStateHeading('Belum ada pengajuan peminjaman')
-            ->emptyStateDescription('Belum ada pengajuan peminjaman yang dilakukan')
+            ->emptyStateHeading('Belum ada riwayat peminjaman')
+            ->emptyStateDescription('Anda belum melakukan mengajukan peminjaman sama sekali')
             ->columns(PeminjamanColumn::make())
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //
             ])
-
-            ->actions([PeminjamanTableActions::group(),])
+            ->actions([
+                ActionGroup::make([
+                    ViewAction::make()
+                    ->color('green')
+                    ->label('Detail')
+                ])
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -74,29 +77,13 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                         }),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
-
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListPeminjamen::route('/'),
-            'create' => Pages\CreatePeminjaman::route('/create'),
-            'view' => Pages\ViewPengajuanPeminjaman::route('/{record}'),
-            'edit' => Pages\EditPeminjaman::route('/{record}/edit'),
-        ];
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->whereIn('status_peminjaman', ['ditolak', 'dikembalikan', 'dibatalkan'])
             ->when(
                 !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
                 fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
@@ -106,24 +93,22 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             ]);
     }
 
-    public static function getPermissionPrefixes(): array
+
+    public static function getRelations(): array
     {
         return [
-            'view',
-            'view_any',
-            'create',
-            'update',
-            'restore',
-            'restore_any',
-            'replicate',
-            'reorder',
-            'delete',
-            'delete_any',
-            'force_delete',
-            'force_delete_any',
-            'decide',
-            'all',
-            'decide_pengembalian',
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListRiwayatPeminjamen::route('/'),
+            'view' => Pages\ViewRiwayatPeminjaman::route('/{record}'),
+
+            // 'create' => Pages\CreateRiwayatPeminjaman::route('/create'),
+            // 'edit' => Pages\EditRiwayatPeminjaman::route('/{record}/edit'),
         ];
     }
 
@@ -131,5 +116,15 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     {
         return $infolist
             ->schema(PeminjamanInfo::make());
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'create',
+            'edit',
+            'delete',
+        ];
     }
 }

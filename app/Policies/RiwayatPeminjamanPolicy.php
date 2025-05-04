@@ -15,7 +15,7 @@ class PeminjamanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_peminjaman');
+        return $user->can('view_any_riwayat::peminjaman');
     }
 
     /**
@@ -23,7 +23,7 @@ class PeminjamanPolicy
      */
     public function view(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('view_peminjaman');
+        return $user->can('view_riwayat::peminjaman');
     }
 
     /**
@@ -31,7 +31,7 @@ class PeminjamanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_peminjaman');
+        return $user->can('create_riwayat::peminjaman');
     }
 
     /**
@@ -39,7 +39,7 @@ class PeminjamanPolicy
      */
     public function update(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('update_peminjaman');
+        return $user->can('update_riwayat::peminjaman');
     }
 
     /**
@@ -47,7 +47,7 @@ class PeminjamanPolicy
      */
     public function delete(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('delete_peminjaman');
+        return $user->can('delete_riwayat::peminjaman');
     }
 
     /**
@@ -55,7 +55,7 @@ class PeminjamanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_peminjaman');
+        return $user->can('delete_any_riwayat::peminjaman');
     }
 
     /**
@@ -63,7 +63,7 @@ class PeminjamanPolicy
      */
     public function forceDelete(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('force_delete_peminjaman');
+        return $user->can('force_delete_riwayat::peminjaman');
     }
 
     /**
@@ -71,7 +71,7 @@ class PeminjamanPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_peminjaman');
+        return $user->can('force_delete_any_riwayat::peminjaman');
     }
 
     /**
@@ -79,7 +79,7 @@ class PeminjamanPolicy
      */
     public function restore(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('restore_peminjaman');
+        return $user->can('restore_riwayat::peminjaman');
     }
 
     /**
@@ -87,7 +87,7 @@ class PeminjamanPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_peminjaman');
+        return $user->can('restore_any_riwayat::peminjaman');
     }
 
     /**
@@ -95,7 +95,7 @@ class PeminjamanPolicy
      */
     public function replicate(User $user, Peminjaman $peminjaman): bool
     {
-        return $user->can('replicate_peminjaman');
+        return $user->can('replicate_riwayat::peminjaman');
     }
 
     /**
@@ -103,39 +103,6 @@ class PeminjamanPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_peminjaman');
+        return $user->can('reorder_riwayat::peminjaman');
     }
-
-    //custom
-
-    public function LihatSemuaPengajuan(User $user){
-        return $user->can('lihat_semua_pengajuan_peminjaman');
-    }
-
-    public function SetujuPengajuan(User $user){
-        return $user->can('setuju_pengajuan_peminjaman');
-    }
-
-    public function TolakPenagjuan(User $user){
-        return $user->can('tolak_pengajuan_peminjaman');
-    }
-
-    public function VerifikasiPengambilan(User $user){
-        return $user->can('verifikasi_pengambilan_peminjaman');
-    }
-
-    public function VerifikasiPengembalian(User $user){
-        return $user->can('verifikasi_pengembalian_peminjaman');
-    }
-
-    public function VerifikasiPembatalan(User $user){
-        return $user->can('verifikasi_pembatalan_peminjaman');
-    }
-
-    public function AjukanPembatalan(User $user){
-        return $user->can('ajukan_pembatalan_peminjaman');
-    }
-
-
-
 }

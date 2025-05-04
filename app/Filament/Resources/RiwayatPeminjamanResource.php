@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PeminjamanResource\Infolists\PeminjamanInfo;
+use App\Filament\Resources\PeminjamanResource\Tables\Actions\BuktiPeminjamanAction;
 use App\Filament\Resources\PeminjamanResource\Tables\PeminjamanColumn;
 use App\Filament\Resources\RiwayatPeminjamanResource\Pages;
 use App\Filament\Resources\RiwayatPeminjamanResource\RelationManagers;
@@ -49,7 +50,10 @@ class RiwayatPeminjamanResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                     ->color('green')
-                    ->label('Detail')
+                    ->label('Detail'),
+                BuktiPeminjamanAction::make()
+                ->label('Bukti Peminjaman')
+                ->color('indigo'),
                 ])
             ])
             ->bulkActions([
@@ -85,7 +89,7 @@ class RiwayatPeminjamanResource extends Resource
         return parent::getEloquentQuery()
             ->whereIn('status_peminjaman', ['ditolak', 'dikembalikan', 'dibatalkan'])
             ->when(
-                !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
+                !Gate::allows('lihat_semua_pengajuan_peminjaman'), // Jika user tidak memiliki izin melihat semua data
                 fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
             )
             ->withoutGlobalScopes([

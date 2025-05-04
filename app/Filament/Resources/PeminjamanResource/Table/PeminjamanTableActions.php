@@ -24,13 +24,13 @@ class PeminjamanTableActions
             ->color('indigo'),
             BarangDiambilAction::make()
             ->color('emerald'),
-            PengajuanPembatalanAction::make()
-            ->color('danger'),
             DikembalikanAction::make()
             ->color('green'),
             SetujuActoin::make()
             ->color('success'),
             TolakAction::make()
+            ->color('danger'),
+            PengajuanPembatalanAction::make()
             ->color('danger'),
             VerifikasiPengajuanPembatalanAction::make()
         ]);

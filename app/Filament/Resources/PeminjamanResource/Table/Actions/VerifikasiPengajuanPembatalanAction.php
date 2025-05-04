@@ -4,7 +4,7 @@ namespace App\Filament\Resources\PeminjamanResource\Tables\Actions;
 use App\Models\Barang;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
-
+use Illuminate\Support\Facades\Gate;
 
 class VerifikasiPengajuanPembatalanAction
 {
@@ -12,7 +12,7 @@ class VerifikasiPengajuanPembatalanAction
     {
         return Action::make('verifikasi_pengajuan_pembatalan')
             ->color('success')
-            // ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'menunggu_pembatalan')
+            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'menunggu_pembatalan' || !Gate::allows('verifikasi_pembatalan_peminjaman'))
             ->label('Setuju Pembatalan')
             ->requiresConfirmation()
             ->action(function ($record) {
@@ -21,8 +21,6 @@ class VerifikasiPengajuanPembatalanAction
                  $record->update([
                      'status_peminjaman' => 'dibatalkan',
                  ]);
-              
-
                  foreach ($record->detailPeminjaman as $detail) {
                      $barang = $detail->barang;
 

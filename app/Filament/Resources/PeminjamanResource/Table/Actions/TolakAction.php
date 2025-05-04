@@ -15,7 +15,7 @@ class TolakAction
     {
         return Action::make('tolak')
             ->label('Tolak')
-            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'diajukan' || !Gate::allows('decide_peminjaman'))
+            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'diajukan' || !Gate::allows('tolak_pengajuan_peminjaman'))
             ->modalHeading('Konfirmasi Tolak Peminjaman')
             ->form([
                 Textarea::make('ketarangan_ditolak')

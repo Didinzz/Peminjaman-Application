@@ -30,7 +30,7 @@ class ListPeminjamen extends ListRecords
             'Dipinjam' => Tab::make('Dipinjam')
                 ->badge(Peminjaman::query()
                     ->when(
-                        !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
+                        !Gate::allows('lihat_semua_pengajuan_peminjaman'), // Jika user tidak memiliki izin melihat semua data
                         fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
                     )
                     ->where('status_peminjaman', 'barang_diambil')

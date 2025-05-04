@@ -48,7 +48,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
                 Tables\Filters\TrashedFilter::make(),
             ])
 
-            ->actions([PeminjamanTableActions::group(),])
+            ->actions([PeminjamanTableActions::group()])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -98,7 +98,7 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
     {
         return parent::getEloquentQuery()
             ->when(
-                !Gate::allows('all_peminjaman'), // Jika user tidak memiliki izin melihat semua data
+                !Gate::allows('lihat_semua_pengajuan_peminjaman'), // Jika user tidak memiliki izin melihat semua data
                 fn($query) => $query->where('user_id', auth()->id()) // Hanya tampilkan data milik user tersebut
             )
             ->withoutGlobalScopes([
@@ -121,9 +121,20 @@ class PeminjamanResource extends Resource implements HasShieldPermissions
             'delete_any',
             'force_delete',
             'force_delete_any',
-            'decide',
-            'all',
-            'decide_pengembalian',
+            
+            // custom
+            'lihat_semua_pengajuan',
+            'setuju_pengajuan',
+            'tolak_pengajuan',
+            'verifikasi_pengambilan',
+            'verifikasi_pengembalian',
+            'verifikasi_pembatalan',
+            'ajukan_pembatalan',
+
+            // 'decide',
+            // 'all',
+            // 'pengembalian',
+            // 'pembatalan'
         ];
     }
 

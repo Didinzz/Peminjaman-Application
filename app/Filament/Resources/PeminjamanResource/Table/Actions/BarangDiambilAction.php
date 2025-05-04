@@ -17,7 +17,7 @@ class BarangDiambilAction
         return Action::make('barang_diambil')
             ->label('Pengambilan')
             ->modalHeading('Konfirmasi Pengambilan Barang')
-            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'disetujui' || !Gate::allows('decide_pengembalian_peminjaman'))
+            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'disetujui' || !Gate::allows('verifikasi_pengambilan_peminjaman'))
             ->form([
                 Section::make()
                     ->schema([

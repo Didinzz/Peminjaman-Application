@@ -12,7 +12,7 @@
 
 
 ADMIN/petugas
-   <!-- - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil --> untuk pengambilan dan pengembalian kurang di atur ulang shieldnya
+   <!-- - tambahkan bukti foto peminjam, nama petugas yang memberikan barang dan ubah status peminjaman menjadi barang sudah diambil untuk pengambilan dan pengembalian kurang di atur ulang shieldnya -->
    <!-- - ketika pengembalian petugas juga menuliskan siapa petugas yang menerima barang ketika dikembalikan validasi tanggal pengembalian -->
    <!-- - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2 tapi masih ada kendala pada   validasi tanggal mengubah tanggal pengajuan menjadi tanggal pemakaian di form -->
    <!-- - sesuaikan infolist -->
@@ -31,7 +31,7 @@ Wakasarpras
     
 Peminjam
     <!-- -tambahkan/ubah tanggal pengajuan menjadi tanggal kapan pemakaiannya dan buat validasi jika mengisi tanggal pemakaian itu tidak boleh kurang dari 2 hari tanggal pengajuan dibuat, contohnya pengajuan dibuat hari senin, maka tanggal pemakaian tidak boleh dipilih tanggal pemakaian hari selasa, hanya bisa dimulai dipilih hari rabu -->
-    <!-- - tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yang dipinjam dan validasi pembatalan hanya bisa dilakukan ketika status barang telah diajukan dan disetuji oleh petugas, serta berikan alasan pembatalan peminjaman --> jangan lupa validasi menggunakan shield dan cari cara untuk menghilangkan resource didalam shield
+    <!-- - tambahkan opsi pembatalan peminjaman ketika peminjam sudah mengajukan barang yang dipinjam dan validasi pembatalan hanya bisa dilakukan ketika status barang telah diajukan dan disetuji oleh petugas, serta berikan alasan pembatalan peminjaman jangan lupa validasi menggunakan shield dan cari cara untuk menghilangkan resource didalam shield -->
 
 
     Tabel Peminjaman

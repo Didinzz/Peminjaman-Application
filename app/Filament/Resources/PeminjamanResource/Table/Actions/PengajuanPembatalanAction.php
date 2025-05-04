@@ -19,7 +19,7 @@ class PengajuanPembatalanAction
             ->hidden(
                 fn($record) => !$record
                     || !in_array($record->status_peminjaman, ['diajukan', 'disetujui'])
-                    // || !Gate::allows('decide_peminjaman')
+                    || !Gate::allows('ajukan_pembatalan_peminjaman')
             )
             ->form([
                 Section::make()

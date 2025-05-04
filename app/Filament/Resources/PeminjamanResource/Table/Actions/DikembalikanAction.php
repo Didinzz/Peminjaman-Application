@@ -26,7 +26,7 @@ class DikembalikanAction
         return Action::make('dikembalikan')
             ->label('Pengembalian')
             ->modalHeading('Konfirmasi Pengembalian')
-            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'barang_diambil' || !Gate::allows('decide_pengembalian_peminjaman'))
+            ->hidden(fn($record) => !$record || $record->status_peminjaman !== 'barang_diambil' || !Gate::allows('verifikasi_pengembalian_peminjaman'))
             ->form([
                 Section::make()
                     ->columns(1)

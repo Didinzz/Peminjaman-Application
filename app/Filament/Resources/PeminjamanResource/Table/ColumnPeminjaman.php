@@ -14,7 +14,7 @@ class PeminjamanColumn
     {
         return [
             TextColumn::make('user.name')
-                ->hidden(!Gate::allows('all_peminjaman'))
+                ->hidden(!Gate::allows('lihat_semua_pengajuan_peminjaman'))
                 ->searchable()
                 ->label('Peminjam'),
             ImageColumn::make('detailPeminjaman.barang.foto')

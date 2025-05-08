@@ -35,7 +35,7 @@ class CreatePeminjaman extends CreateRecord
 
     protected function getCreatedNotificationMessage(): ?string
     {
-        return 'Peminjaman berhasil di ajukan';
+        return 'Peminjaman berhasil diajukan';
     }
 
 

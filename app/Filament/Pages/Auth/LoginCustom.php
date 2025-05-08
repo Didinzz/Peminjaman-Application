@@ -46,7 +46,7 @@ class LoginCustom extends Login
     protected function throwFailureValidationException(): never
     {
         throw ValidationException::withMessages([
-            'data.login' => __('Password or Email/Name is incorrect'),
+            'data.login' => __('Username, Email, atau Password salah!'),
         ]);
     }
 }

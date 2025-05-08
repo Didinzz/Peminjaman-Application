@@ -87,7 +87,7 @@ class PeminjamanInfo
                                         ->label('Tanggal Dikembalikan'),
                                     TextEntry::make('nama_petugas_pengembalian')
                                         ->default('Belum dikembalikan')
-                                        ->label('Dikembalikan Oleh'),
+                                        ->label('Diterima Oleh'),
                                     TextEntry::make('status_pengembalian')
                                         ->badge()
                                         ->formatStateUsing(fn($state): string => str()->headline($state))

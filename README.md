@@ -17,7 +17,6 @@ ADMIN/petugas
    <!-- - ketika barang dikembalikan oleh peminjam, petugas dapat memverifikasi kondisi barang yang dipinjam, bisa jadi barang dipinjam ada beberapa yang rusak dan barang yang rusak tidak akan kembali masuk ke stok barang, masalahnya disini adalah bagaimana cara admin memverifikasi jika barang dipinjam 3 dan dikembalikan rusak 1, maka yang kembali ke stok barang adalah 2 tapi masih ada kendala pada   validasi tanggal mengubah tanggal pengajuan menjadi tanggal pemakaian di form -->
    <!-- - sesuaikan infolist -->
 
-   - nanti kalau peminjaman yang diajukan lebih dari 1 hari dari tanggal pemakaian tidak diambil oleh peminjam, maka status akan berubah dibatalkan dengan alasan "barang tidak diambil oleh peminjam"
     
    <!-- - inventaris barang bisa ditambah dengan kondisi barang nantinya akan difilter tapi yang tampil masuk distock hanya barang bagus saja, nanti untuk barang yang kondisi rusak bisa dipakai dan rusak tidak bisa dipakai itu difilter dan ketahuan ada berapa -->
    <!-- - memverifikasi pengajuan pembatalan peminjaman yang dilakukan oleh peminjam. -->

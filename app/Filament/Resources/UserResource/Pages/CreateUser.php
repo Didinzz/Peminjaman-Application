@@ -4,12 +4,19 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 
+    protected function getCreateFormAction(): Action
+    {
+        return parent::getCreateFormAction()
+            ->label('Tambah User');
+    }
+    
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

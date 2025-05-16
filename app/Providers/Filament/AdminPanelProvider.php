@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(LoginCustom::class)
-            ->brandName('Administrasi Peminjaman')
+            ->brandName('MosiPras')
             ->colors([
                 'primary' => Color::Lime,
                 'orange' => Color::Orange,

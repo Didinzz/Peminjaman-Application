@@ -43,22 +43,23 @@ class BarangResource extends Resource
                         TextInput::make('nama_barang')
                             ->label('Nama Barang')
                             ->required(),
-                        // TextInput::make('stock')
-                        //     ->label('Stok Tersedia')
-                        //     ->required(),
                         TextInput::make('stok_bagus')
                             ->label('Stok Bagus')
+                            ->numeric()
                             ->required(),
                         TextInput::make('stok_rusak_ringan')
+                            ->numeric()
                             ->label('Stok Rusak Ringan')
                             ->required(),
                         TextInput::make('stok_rusak_berat')
+                            ->numeric()
                             ->label('Stok Rusak Berat')
                             ->required(),
                         Select::make('kategori_barang')
+                            ->label('Jenis Barang Milik Negara (BMN)')
                             ->options([
-                                'Elektronik' => 'Elektronik',
-                                'Non-Elektronik' => 'Non-Elektronik',
+                                'Elektronik' => 'BMN Elektronik',
+                                'Non-Elektronik' => 'BMN Non-Elektronik',
                             ])
                             ->required(),
                         FileUpload::make('foto')
@@ -98,7 +99,7 @@ class BarangResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('kategori_barang')
-                    ->label('Kategori Barang'),
+                    ->label('Jenis BMN'),
             ])
             ->filters([
                 //

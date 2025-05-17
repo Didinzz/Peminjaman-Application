@@ -24,6 +24,12 @@ class totalPeminjamanKategoriBarangPieChart extends ChartWidget
         return [
             'maintainAspectRatio' => false,
             'responsive' => true,
+            'animation' => [
+                'animateRotate' => true,   // Animasi rotasi saat load
+                'animateScale' => true,    // Animasi scale saat load
+                'duration' => 600,
+                'easing' => 'easeInOutCubic',
+            ],
             'plugins' => [
                 'legend' => [
                     'position' => 'top',

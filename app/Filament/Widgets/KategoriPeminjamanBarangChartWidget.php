@@ -11,26 +11,33 @@ class KategoriPeminjamanBarangChartWidget extends ChartWidget
     protected static ?int $sort = 2;
     protected static ?string $maxHeight = '500px';
 
-    protected static ?string $heading = 'Grafik Peminjaman Jenis Barang';
+
+
+    protected static ?string $heading = 'Grafik Peminjaman BMN';
     protected static bool $isLazy = true;
-
-    
-
 
     protected function getOptions(): array
     {
         return [
             // 'maintainAspectRatio' => false,
-            // 'responsive' => true,
-            'height' => 500,
+            'responsive' => true,
+            'animation' => [
+                'duration' => 800,
+                'easing' => 'easeOutQuart', // atau coba 'easeInOutCubic', 'easeOutBounce', dll
+            ],
             'plugins' => [
                 'legend' => [
                     'position' => 'bottom',
                 ],
+
             ],
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
+                ],
+                'x' => [
+                    'barPercentage' => 0.7,   // Lebar bar 70% dari slot
+                    'categoryPercentage' => 0.8,  // Ruang antar kategori
                 ],
             ],
         ];

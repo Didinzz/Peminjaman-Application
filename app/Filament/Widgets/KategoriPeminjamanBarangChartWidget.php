@@ -8,10 +8,34 @@ use Illuminate\Support\Facades\DB;
 
 class KategoriPeminjamanBarangChartWidget extends ChartWidget
 {
+    protected static ?int $sort = 2;
+    protected static ?string $maxHeight = '500px';
+
     protected static ?string $heading = 'Grafik Peminjaman Jenis Barang';
-    protected static ?string $maxHeight = '200px';
-    protected static ?string $maxWidth = '50%';
     protected static bool $isLazy = true;
+
+    
+
+
+    protected function getOptions(): array
+    {
+        return [
+            // 'maintainAspectRatio' => false,
+            // 'responsive' => true,
+            'height' => 500,
+            'plugins' => [
+                'legend' => [
+                    'position' => 'bottom',
+                ],
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+        ];
+    }
+
 
     protected function getData(): array
     {

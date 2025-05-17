@@ -11,6 +11,7 @@ use function Livewire\before;
 
 class PeminjamanWidget extends BaseWidget
 {
+    protected static ?int $sort = 1;
     protected function getStats(): array
     {
         return [
@@ -28,4 +29,5 @@ class PeminjamanWidget extends BaseWidget
                 ->chart([rand(10, 100), rand(10, 100), rand(10, 100), rand(10, 100)]),
         ];
     }
+
 }

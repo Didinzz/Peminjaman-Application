@@ -8,13 +8,15 @@ use Filament\Support\Enums\IconPosition;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Number;
 
 class PeminjamanWidget extends BaseWidget
 {
 
     use InteractsWithPageFilters;
-    
+
 
     protected static ?int $sort = 1;
     protected function getStats(): array
@@ -66,5 +68,10 @@ class PeminjamanWidget extends BaseWidget
                 ->descriptionIcon('heroicon-o-clock', IconPosition::Before)
                 ->color('warning'),
         ];
+    }
+
+    public static function canView(): bool
+    {
+        return Gate::allows('lihat_semua_pengajuan_peminjaman');
     }
 }

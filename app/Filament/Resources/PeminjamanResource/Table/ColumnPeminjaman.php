@@ -32,8 +32,10 @@ class PeminjamanColumn
             TextColumn::make('tanggal_kembali')
                 ->date('d F Y')
                 ->label('Pengembalian'),
+            
             TextColumn::make('status_peminjaman')
                 ->badge()
+                ->searchable()
                 ->formatStateUsing(fn($state): string => str()->headline($state))
                 ->label('Status')
                 ->description(function(Peminjaman $record): string {

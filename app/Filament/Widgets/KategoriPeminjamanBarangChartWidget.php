@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class KategoriPeminjamanBarangChartWidget extends ChartWidget
 {
@@ -94,5 +95,10 @@ class KategoriPeminjamanBarangChartWidget extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    public static function canView(): bool
+    {
+        return Gate::allows('lihat_semua_pengajuan_peminjaman');
     }
 }

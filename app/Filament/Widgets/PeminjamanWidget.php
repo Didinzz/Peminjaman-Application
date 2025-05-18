@@ -50,15 +50,13 @@ class PeminjamanWidget extends BaseWidget
             : ($number < 1000000
                 ? Number::format($number / 1000, 2) . 'k'
                 : Number::format($number / 1000000, 2) . 'm');
-        // dd($startDate);
-
         return [
             Stat::make('Total Peminjaman', $formatNumber($totalPeminjaman))
                 ->description('Total seluruh transaksi peminjaman')
                 ->descriptionIcon('heroicon-o-archive-box', IconPosition::Before)
                 ->color('success'),
 
-            Stat::make('Hari Ini', $formatNumber($peminjamanHariIni))
+            Stat::make('Peminjaman Hari Ini', $formatNumber($peminjamanHariIni))
                 ->description('Jumlah peminjaman hari ini')
                 ->descriptionIcon('heroicon-o-calendar-days', IconPosition::Before)
                 ->color('primary'),

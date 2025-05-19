@@ -99,7 +99,11 @@ class BarangResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('kategori_barang')
-                    ->label('Jenis BMN'),
+                    ->label('Jenis BMN')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'Elektronik' => 'BMN Elektronik',
+                        'Non-Elektronik' => 'BMN Non-Elektronik',
+                    }),
             ])
             ->filters([
                 //

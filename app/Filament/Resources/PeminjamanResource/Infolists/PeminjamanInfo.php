@@ -30,7 +30,11 @@ class PeminjamanInfo
                                     TextEntry::make('barang.nama_barang')
                                         ->label('Nama Barang'),
                                     TextEntry::make('barang.kategori_barang')
-                                        ->label('Tipe Barang'),
+                                        ->label('Jenis BMN')
+                                        ->formatStateUsing(fn(string $state): string => match ($state) {
+                                            'Elektronik' => 'BMN Elektronik',
+                                            'Non-Elektronik' => 'BMN Non-Elektronik',
+                                        }),
                                     TextEntry::make('jumlah_pinjaman')
                                         ->label('Jumlah Pinjaman'),
                                 ]),

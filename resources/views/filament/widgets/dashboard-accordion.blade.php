@@ -1,8 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section>
+        <h2 class="text-xl font-bold mb-4 dark:text-white text-center">FAQ</h2>
         <x-filament::card>
-            <h2 class="text-xl font-bold mb-4 dark:text-white">Panduan Penggunaan Aplikasi</h2>
-
             <div x-data="{ open: null }" class="space-y-2">
                 {{-- Item 1 --}}
                 <div class="border border-gray-200 dark:border-gray-700 rounded-md">
@@ -99,7 +98,8 @@
                 <div class="border border-gray-200 dark:border-gray-700 rounded-md">
                     <button @click="open === 6 ? open = null : open = 6"
                         class="w-full flex justify-between items-center px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-800 rounded-md focus:outline-none">
-                        Apa yang terjadi jika saya tidak atau terlambat mengembalikan barang atau barang dikembalikan dalam keadaan rusak?
+                        Apa yang terjadi jika saya tidak atau terlambat mengembalikan barang atau barang dikembalikan
+                        dalam keadaan rusak?
                         <svg :class="open === 6 ? 'rotate-180' : ''"
                             class="w-4 h-4 transform transition-transform duration-300 text-gray-500 dark:text-white"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +107,8 @@
                         </svg>
                     </button>
                     <div x-show="open === 6" x-collapse class="px-4 py-2 text-sm text-gray-600 dark:text-white">
-                        Jika barang yang dikembalikan <strong>terlambat atau rusak</strong> maka akan dikenakan sanksi sesuai dengna kebijakan sekolah.
+                        Jika barang yang dikembalikan <strong>terlambat atau rusak</strong> maka akan dikenakan sanksi
+                        sesuai dengna kebijakan sekolah.
                     </div>
                 </div>
             </div>

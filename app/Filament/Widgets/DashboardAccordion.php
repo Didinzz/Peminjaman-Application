@@ -8,7 +8,7 @@ class DashboardAccordion extends Widget
 {
     protected static string $view = 'filament.widgets.dashboard-accordion';
 
-    protected static ?int $sort = 3; // agar muncul di atas
+    protected static ?int $sort = 4; // agar muncul di atas
 
     protected int | string | array $columnSpan = 'full'; // lebar penuh
 

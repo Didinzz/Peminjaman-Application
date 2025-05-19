@@ -28,8 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->font('Poppins')
             ->id('admin')
             ->path('admin')
+            // ->brandName('MOSIPRAS')
             ->login(LoginCustom::class)
-            ->brandName('MOSIPRAS')
             
             ->colors([
                 'primary' => Color::Lime,
@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
                 'rose' => Color::Rose,
                 'amber' => Color::Amber,
             ])
+            ->favicon('MosiPrasLogo.jpg')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([])

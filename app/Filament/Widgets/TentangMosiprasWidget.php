@@ -4,9 +4,9 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
 
-class DashboardAccordion extends Widget
+class TentangMosiprasWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.dashboard-accordion';
+    protected static string $view = 'filament.widgets.tentang-mosipras-widget';
 
     protected static ?int $sort = 3; // agar muncul di atas
 

@@ -7,5 +7,5 @@
         <!-- ... -->
     </svg>
 
-    Brand name
+    dfasdfasdfa
 </div>

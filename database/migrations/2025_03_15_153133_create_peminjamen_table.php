@@ -22,11 +22,11 @@ return new class extends Migration
             $table->string('foto_pegembalian')->nullable();
             $table->date('tanggal_dikembalikan')->nullable();
             $table->string('ketarangan_ditolak')->nullable();
-            $table->string('foto_pengambilan')->nullable()->after('surat_peminjaman');
-            $table->string('nama_petugas_pengambilan')->nullable()->after('foto_pengambilan');
-            $table->string('nama_petugas_pengembalian')->nullable()->after('foto_pegembalian');
-            $table->text('alasan_pembatalan')->nullable()->after('ketarangan_ditolak');
-            $table->enum('status_pengembalian', ['tepat_waktu', 'terlambat'])->nullable()->after('nama_petugas_pengembalian');
+            $table->string('foto_pengambilan')->nullable();
+            $table->string('nama_petugas_pengambilan')->nullable();
+            $table->string('nama_petugas_pengembalian')->nullable();
+            $table->text('alasan_pembatalan')->nullable();
+            $table->enum('status_pengembalian', ['tepat_waktu', 'terlambat'])->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
